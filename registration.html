@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration</title>
+</head>
+
+<body>
+    <h2> Welcome to Registration Page</h2>
+
+    <!-- Display flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <p class="{{ category }}">{{ message }}</p>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    <!--  the action attribute of the form tag is used to specify the URL to which the form data will be sent. This route is same as which we pass on the router(which we form.)
+     -->
+    <form action="{{ url_for('register') }}" method="POST">
+        {{ form.hidden_tag() }} <!--CSRF token for security-->
+        <fieldset>
+            <legend>Registration Form</legend>
+
+            <div id="username">
+                <label for="username">{{ form.username.label }}</label>
+                {{ form.username(id="username",type="text") }}
+                {% if form.username.errors %}
+                    <ul>
+                    {% for error in form.username.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                    </ul>
+                {% endif %}
+            </div><br>
+            
+            <div id="full_name">
+                <label for="fullname">{{ form.fullname.label }}</label>
+                {{ form.fullname(type="text") }}
+                {% if form.fullname.errors %}
+                    <ul>
+                    {% for error in form.fullname.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                    </ul>
+                {% endif %}
+            </div><br>
+
+            <div id="email">
+                <label for="email">{{ form.email.label }}</label>
+                {{ form.email(type="email") }}
+                {% if form.email.errors %}
+                    <ul>
+                    {% for error in form.email.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                    </ul>
+                {% endif %}
+            </div><br>
+
+            <div id="password">
+                <label for="password">{{ form.password.label }}</label>
+                {{ form.password(type="password") }}
+                {% if form.password.errors %}
+                    <ul>
+                    {% for error in form.password.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                    </ul>
+                {% endif %}
+            </div><br>
+
+           
+            <div id="qualification">
+                <label for="qualification">{{ form.qualification.label }}</label>
+                {{ form.qualification(type="text") }}
+                {% if form.qualification.errors %}
+                    <ul>
+                    {% for error in form.qualification.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                    </ul>
+                {% endif %}
+            </div><br>
+            
+            <div id="language_pref">
+                <label for="language_pref">{{ form.language_pref.label }}</label>
+                {{ form.language_pref }}
+                {% if form.language_pref.errors %}
+                    <ul>
+                    {% for error in form.language_pref.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                    </ul>
+                {% endif %}
+            </div><br>
+            
+            <div id="interest">
+                <label for="interest">{{ form.interest.label }}</label>
+                {{ form.interest }}
+                {% if form.interest.errors %}
+                    <ul>
+                    {% for error in form.interest.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                    </ul>
+                {% endif %}
+            </div><br>
+
+            <div id="date_of_birth">
+                <label for="date_of_birth">{{ form.date_of_birth.label }}</label>
+                {{ form.date_of_birth(type="date") }}
+                {% if form.date_of_birth.errors %}
+                    <ul>
+                    {% for error in form.date_of_birth.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                    </ul>
+                {% endif %}
+            </div><br>
+            
+
+            <div id="submit">
+                {{ form.submit() }}
+                <label><a href="{{ url_for('login') }}">Login</a></label>
+            </div>
+            
+           
+        </fieldset>
+    </form>
+</body>
+
+</html>
