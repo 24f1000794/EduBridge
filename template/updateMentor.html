@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Update Mentor</title>
+  <style>
+    .module-box {
+      border: 1px solid #ccc;
+      padding: 15px;
+      margin-block-end: 10px;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Update Mentor</h1>
+
+  <form action="{{ url_for('update_mentor', id=mentor.id) }}" method="POST" enctype="multipart/form-data">
+    
+    <div>
+      <label for="username">Mentor Username:</label>
+      <input type="text" name="username" value="{{ mentor.username }}" readonly />
+    </div>
+
+    <div>
+      <label for="name">Mentor Name:</label>
+      <input type="text" name="name" value="{{ mentor.fullname }}" required />
+    </div>
+
+    <div>
+      <label for="expertise">Expertise:</label>
+      <input type="text" name="expertise" value="{{ mentor.expertise }}" required>
+    </div>
+
+    <div>
+      <label for="email">Email:</label>
+      <input type="email" name="email" value="{{ mentor.email }}" required>
+    </div>
+
+    <div>
+      <label for="password">Password:</label>
+      <input  type="password" name="password" placeholder="{{ mentor.password }}" required readonly/>
+    </div>
+
+    <div>
+      <label for="availability">Availability:</label>
+      <select name="availability" id="availability" required>
+        {% set slots = ['Forenoon', 'noon', 'morning', 'night', 'midnight'] %}
+        {% for slot in slots %}
+          <option value="{{ slot }}" {% if mentor.availability == slot %}selected{% endif %}>{{ slot }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div>
+      <label for="language_pref">Language Preference:</label>
+      <input type="text" name="language_pref" value="{{ mentor.language_pref }}" required>
+    </div>
+
+    <div>
+      <input type="submit" value="Update Mentor"/>
+    </div>
+
+  </form>
+</body>
+</html>

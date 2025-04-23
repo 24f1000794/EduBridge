@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Details</title>
+</head>
+<body>
+    <h1>Course Details</h1>
+
+    <ul>
+        <li><strong>Course Name:</strong> {{ course.name }}</li>
+        <li><strong>Description:</strong> {{ course.description }}</li>
+        <li><strong>Category:</strong> {{ course.category }}</li>
+        <li><strong>Language:</strong> {{ course.language }}</li>
+        <li><strong>Level:</strong> {{ course.level }}</li>
+    </ul>
+
+    <h2>Modules & Submodules</h2>
+
+    {% for module in modules %}
+    <div style="margin-bottom: 20px;">
+        <strong>Module {{ loop.index }}:</strong> {{ module.module.title }}
+
+        <select>
+            {% if module.submodules %}
+                {% for sub in module.submodules %}
+                    <option>{{ sub.name }}</option>
+                {% endfor %}
+            {% else %}
+                <option disabled>No submodules found</option>
+            {% endif %}
+        </select>
+    </div>
+    {% endfor %}
+
+</body>
+</html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Add Course</title>
+  <style>
+    .module-box {
+      border: 1px solid #ccc;
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 5px;
+    }
+    .submodule-box {
+      margin-left: 20px;
+      margin-top: 10px;
+      border-left: 2px dashed #888;
+      padding-left: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Add a Course</h1>
+
+  <form action="/course/create" method="POST" enctype="multipart/form-data" id="course-form">
+    <div>
+      <label for="name">Course Name:</label>
+      <input type="text" name="name" placeholder="Linear Algebra" required />
+    </div>
+
+    <div>
+      <label for="description">Course Description:</label>
+      <textarea name="description" required></textarea>
+    </div>
+
+    <div>
+      <label for="level">Level:</label>
+      <select name="level" id="level">
+        <option value="Beginner">Beginner</option>
+        <option value="Intermediate">Intermediate</option>
+        <option value="Advance">Advance</option>
+      </select>
+    </div>
+
+    <hr>
+
+    <h3>Course Content</h3>
+    <div id="modules"></div>
+
+    <button type="button" onclick="addModule()">+ Add Module</button>
+
+    <hr>
+
+    <div>
+        <label for="language">Language:</label>
+        <select name="language" id="language">
+            <option value="Hindi">Hindi</option>
+            <option value="English">English</option>
+        </select>
+    </div>
+    
+    <div>
+      <label for="category">Category:</label>
+      <select name="category" id="category">
+        <option value="computer">Computer</option>
+        <option value="maths">Maths</option>
+      </select>
+    </div>
+
+    <div>
+      <input type="submit" value="Submit" />
+    </div>
+  </form>
+
+  <script>
+    let moduleCount = 0;
+  
+    function addModule() {
+      const moduleIndex = moduleCount++;
+      const moduleDiv = document.createElement("div");
+      moduleDiv.classList.add("module-box");
+  
+      const submodulesDivId = `submodules-${moduleIndex}`;
+  
+      moduleDiv.innerHTML = `
+        <h4>Module ${moduleIndex + 1}</h4>
+        <label>Module Title:</label>
+        <input type="text" name="module_titles[]" placeholder="Module title" required />
+  
+        <div id="${submodulesDivId}" class="submodules-container"></div>
+        <button type="button" onclick="addSubmodule('${submodulesDivId}', ${moduleIndex})">+ Add Submodule</button>
+      `;
+  
+      document.getElementById("modules").appendChild(moduleDiv);
+    }
+  
+    function addSubmodule(containerId, moduleIndex) {
+      const submoduleDiv = document.createElement("div");
+      submoduleDiv.classList.add("submodule-box");
+      submoduleDiv.innerHTML = `
+        <label>Submodule Name:</label>
+        <input type="text" name="submodule_names_${moduleIndex}[]" placeholder="What is a matrix?" required />
+  
+        <br><label>Upload Video:</label>
+        <input type="file" name="submodule_videos_${moduleIndex}[]" accept="video/*" required />
+        <br><br>
+      `;
+      document.getElementById(containerId).appendChild(submoduleDiv);
+    }
+  </script>
+  
+</body>
+</html>

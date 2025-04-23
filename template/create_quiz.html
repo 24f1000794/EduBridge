@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Quiz - EduBridge</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Create Quiz</h1>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ 'success' if category == 'success' else 'danger' }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+        <form method="POST" action="{{ url_for('create_quiz') }}">
+            {{ form.hidden_tag() if form else '' }}
+            <div class="mb-3">
+                <label for="title" class="form-label">Quiz Title</label>
+                <input type="text" class="form-control" id="title" name="title" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="description" class="form-label">Description</label>
+                <textarea class="form-control" id="description" name="description"></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label for="time_limit" class="form-label">Time Limit (minutes)</label>
+                <input type="number" class="form-control" id="time_limit" name="time_limit" min="1">
+            </div>
+
+            <div class="mb-3">
+                <label for="course_id" class="form-label">Select Course</label>
+                <select class="form-select" id="course_id" name="course_id" required>
+                    <option value="" disabled selected>-- Select a course --</option>
+                    {% for course in courses %}
+                    <option value="{{ course.id }}">{{ course.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        
+            <div id="questions">
+                <!-- Initial question added by JavaScript -->
+            </div>
+            <button type="button" class="btn btn-secondary mb-3" onclick="addQuestion()">Add Question</button>
+            <button type="submit" class="btn btn-primary">Create Quiz</button>
+        </form>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let questionIndex = 0;
+
+        function addQuestion() {
+            const questionsDiv = document.getElementById('questions');
+            const newQuestion = document.createElement('div');
+            newQuestion.className = 'question-block mb-3 border p-3';
+            newQuestion.dataset.index = questionIndex;
+            newQuestion.innerHTML = `
+                <h5>Question ${questionIndex + 1}</h5>
+                <div class="mb-3">
+                    <label class="form-label">Question Text</label>
+                    <input type="text" class="form-control" name="questions[${questionIndex}][text]" required>
+                </div>
+                <div class="options mb-3">
+                    <label class="form-label">Options</label>
+                    <div class="input-group mb-2">
+                        <input type="text" class="form-control" name="questions[${questionIndex}][options][]" required>
+                        <button type="button" class="btn btn-danger btn-remove-option">Remove</button>
+                    </div>
+                    <div class="input-group mb-2">
+                        <input type="text" class="form-control" name="questions[${questionIndex}][options][]" required>
+                        <button type="button" class="btn btn-danger btn-remove-option">Remove</button>
+                    </div>
+                    <button type="button" class="btn btn-secondary btn-add-option">Add Option</button>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Correct Option</label>
+                    <select class="form-control" name="questions[${questionIndex}][correct]" required>
+                        <option value="0">Option 1</option>
+                        <option value="1">Option 2</option>
+                    </select>
+                </div>
+                <button type="button" class="btn btn-danger btn-remove-question">Remove Question</button>
+            `;
+            questionsDiv.appendChild(newQuestion);
+            attachEventListeners(newQuestion);
+            questionIndex++;
+        }
+
+        function attachEventListeners(element) {
+            // Add Option
+            element.querySelectorAll('.btn-add-option').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const optionsDiv = this.parentElement;
+                    const questionIndex = this.closest('.question-block').dataset.index;
+                    const optionCount = optionsDiv.querySelectorAll('.input-group').length;
+                    const newOption = document.createElement('div');
+                    newOption.className = 'input-group mb-2';
+                    newOption.innerHTML = `
+                        <input type="text" class="form-control" name="questions[${questionIndex}][options][]" required>
+                        <button type="button" class="btn btn-danger btn-remove-option">Remove</button>
+                    `;
+                    optionsDiv.insertBefore(newOption, this);
+                    updateCorrectOptions(optionsDiv, questionIndex, optionCount + 1);
+                });
+            });
+
+            // Remove Option
+            element.querySelectorAll('.btn-remove-option').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const optionsDiv = this.closest('.options');
+                    const questionIndex = this.closest('.question-block').dataset.index;
+                    const optionCount = optionsDiv.querySelectorAll('.input-group').length;
+                    if (optionCount > 2) {
+                        this.parentElement.remove();
+                        updateCorrectOptions(optionsDiv, questionIndex, optionCount - 1);
+                    } else {
+                        alert('At least two options are required.');
+                    }
+                });
+            });
+
+            // Remove Question
+            element.querySelectorAll('.btn-remove-question').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    if (document.querySelectorAll('.question-block').length > 1) {
+                        this.parentElement.remove();
+                    } else {
+                        alert('At least one question is required.');
+                    }
+                });
+            });
+        }
+
+        function updateCorrectOptions(optionsDiv, questionIndex, optionCount) {
+            const select = optionsDiv.parentElement.querySelector('select[name="questions[' + questionIndex + '][correct]"]');
+            const currentValue = select.value;
+            select.innerHTML = '';
+            for (let i = 0; i < optionCount; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.text = `Option ${i + 1}`;
+                if (i == currentValue) option.selected = true;
+                select.appendChild(option);
+            }
+        }
+
+        // Initial question
+        addQuestion();
+    </script>
+</body>
+</html>

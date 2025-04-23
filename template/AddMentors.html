@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Add a mentor</title>
+  <style>
+    .module-box {
+      border: 1px solid #ccc;
+      padding: 15px;
+      margin-block-end: 10px;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Add a Mentor</h1>
+
+  <form action="{{ url_for('create_mentor') }}" method="POST" enctype="multipart/form-data" id="course-form">
+
+    <div>
+      <label for="username">Mentor Username:</label>
+      <input type="text" name="username" placeholder="Abhay" required />
+    </div>
+
+    <div>
+      <label for="name">Mentor Name:</label>
+      <input type="text" name="name" placeholder="Abhay Rajput" required />
+    </div>
+
+    <div>
+      <label for="expert">Expertise:</label>
+      <input type="text" name="expert" placeholder="Backend Development" required>
+    </div>
+
+    <div>
+      <label for="email">Email:</label>
+      <input  type="email" name="email" placeholder="Abhayrajput123@gmail.com" required>
+    </div>
+
+    <div>
+      <label for="password">Password:</label>
+      <input  type="password" name="password" placeholder="1222344" required>
+    </div>
+
+    <div>
+      <label for="level">Avaliability:</label>
+      <select name="level" id="level">
+        <option value="Forenoon">Forenoon</option>
+        <option value="noon">Noon</option>
+        <option value="morning">Morning</option>
+        <option value="night">Night</option>
+        <option value="midnight">Midnight</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="language_pref">language_pref:</label>
+      <input  type="language_pref" name="language_pref" placeholder="language_pref" required>
+    </div>
+
+    <div>
+        <input type="submit" value="Add Mentor"/>
+    </div>
+</body>
+</html>
