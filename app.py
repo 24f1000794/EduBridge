@@ -115,7 +115,7 @@ def role_required(allowed_roles):
 
 @app.route('/')
 def LandingPage():
-    return render_template('/template/LandingPage.html')
+    return render_template('LandingPage.html')
 
 @app.route('/user/register', methods=['GET', 'POST'])
 def register():
