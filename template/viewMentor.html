@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mentors</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+      body {
+        background-color: #f4f7fc;
+        color: #333;
+      }
+
+      h1 {
+        text-align: center;
+        color: #6a1b9a;
+        margin-bottom: 40px;
+      }
+
+      .mentor-card {
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+        background-color: white;
+        padding: 20px;
+      }
+
+      .mentor-card-header {
+        background-color: #6a1b9a;
+        color: white;
+        font-size: 1.2rem;
+        text-align: center;
+        padding: 10px;
+        border-radius: 8px 8px 0 0;
+      }
+
+      .mentor-card-body {
+        padding-top: 15px;
+      }
+
+      .mentor-card-body p {
+        margin-bottom: 10px;
+      }
+
+      .mentor-card-footer {
+        text-align: center;
+        margin-top: 15px;
+      }
+
+      .btn {
+        background-color: #6a1b9a;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        transition: background-color 0.3s ease;
+        margin: 0 5px;
+      }
+
+      .btn:hover {
+        background-color: #4a0072;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin-top: 50px;
+      }
+
+      .create-link {
+        display: block;
+        text-align: center;
+        margin-top: 40px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>All Mentors</h1>
+
+      <div class="row">
+        {% for mentor in mentors %}
+        <div class="col-md-6 col-lg-4">
+          <div class="mentor-card">
+            <div class="mentor-card-header">
+              {{ mentor.fullname }}<br>
+              <small>{{ mentor.username }}</small>
+            </div>
+            <div class="mentor-card-body">
+              <p><strong>Expertise:</strong> {{ mentor.expertise }}</p>
+              <p><strong>Email:</strong> {{ mentor.email }}</p>
+              <p><strong>Language Preference:</strong> {{ mentor.language_pref }}</p>
+              <p><strong>Availability:</strong> {{ mentor.availability }}</p>
+            </div>
+            <div class="mentor-card-footer">
+              <a href="{{ url_for('update_mentor', id=mentor.id) }}" class="btn btn-sm">Update</a>
+              <a href="{{ url_for('delete_mentor', id=mentor.id) }}" class="btn btn-sm">Delete</a>
+            </div>
+          </div>
+        </div>
+        {% else %}
+        <div class="text-center text-muted">
+          <p>No mentors available at the moment.</p>
+        </div>
+        {% endfor %}
+      </div>
+
+      <div class="create-link">
+        <a href="{{ url_for('create_mentor') }}" class="btn btn-lg">Create Mentor</a>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>
