@@ -2,11 +2,13 @@ from datetime import datetime
 import os
 import random
 import traceback
-from sqlalchemy.orm import Session
+import requests
+#from sqlalchemy.orm import Session
 from flask_mail import Mail,Message 
 from flask import Flask, jsonify
 from flask import render_template, redirect, request, url_for,session,flash
 from flask_login import LoginManager, login_user, current_user, logout_user, login_required
+from functools import wraps
 from flask_bcrypt import Bcrypt
 from flask_wtf import CSRFProtect
 from dotenv import load_dotenv
@@ -14,7 +16,7 @@ from config import Config
 from models import db, User
 from forms.userform import RegistrationForm, LoginForm,forgetPasswordForm,requestResetPasswordForm,mentorRegistration
 from werkzeug.utils import secure_filename
-from models.user import User, Course,Mentor,Progress,Module,Message,Quiz,Question,Option,QuizAttempt,Answer,Badge,SubModule
+from models.user import User, Course,Mentor,Progress,Module,Quiz,Question,Option,QuizAttempt,Answer,Badge,SubModule,Note
 
 
 
@@ -27,16 +29,16 @@ db.init_app(app) #initialize the DB
 csrf = CSRFProtect(app) # enable CSRF protection
 bcrypt = Bcrypt(app)
 mail = Mail(app)
+# mail.init_app(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'  # Redirect here if user not logged in
+GROQ_API_KEY = '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'
 
 UPLOAD_FOLDER = 'static/uploads/' 
 
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
-
-
 
 # @login_manager.user_loader
 # def load_user(user_id):
@@ -96,6 +98,20 @@ def award_badges(progress):
             badges.append(badge.name)
     db.session.commit()
     return badges
+
+#Helper function is for RBAC
+def role_required(allowed_roles):
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            if current_user.role not in allowed_roles:
+                flash('Access denied: insufficient permissions.', 'error')
+                return redirect(url_for('quiz_list'))  # Or a 403 page
+            return f(*args, **kwargs)
+        return decorated_function
+    return decorator
+
+
 
 @app.route('/')
 def LandingPage():
@@ -207,7 +223,9 @@ def login():
 
         # If not found or not valid in User, check Mentor
         mentor = Mentor.query.filter_by(username=username).first()
-        print(mentor)
+        # print(mentor)
+        # print(current_user.role)
+        # print(mentor.password)
         if mentor and bcrypt.check_password_hash(mentor.password, password):
             #   session['username'] = mentor.username
             #   session['role'] = 'mentor'
@@ -217,7 +235,7 @@ def login():
             # print("Logged in?", current_user.is_authenticated)
             # print("Current user:", current_user)
             # print("Session:", dict(session))
-            # print("Redirecting to mentor_dashboard with ID:", mentor.id)
+            print("Redirecting to mentor_dashboard with ID:", mentor.id)
             return redirect(url_for('mentor_dashboard' , id = mentor.id))
 
         # If neither matched
@@ -234,16 +252,24 @@ def login():
 def dashboard(id):
     user = User.query.get_or_404(id)
     if request.method == 'GET':
-        return render_template('dashboard.html', user=user)
+        course = Course.query.filter(Course.name.ilike(f"%{user.interest}%")).all()
+        if course:
+            print("Course exist", course)
+        else:
+            print("course is not exist")
+        return render_template('dashboard.html', user=user, courses=course)
     else:
         flash("You must log in first.", "warning")
         return redirect(url_for('login'))
+
 
 @app.route('/mentor/<int:id>/dashboard') # check
 @login_required
 def mentor_dashboard(id):
     mentor = Mentor.query.get_or_404(id)
-    if 'username' in session and session.get('role') == 'mentor':
+    #if 'username' in session and session.get('role') == 'mentor':
+    print(current_user.role)
+    if current_user.role == 'mentor':
         return render_template('mentor_dashborad.html', mentor_name = mentor.fullname)
     else:
         flash("You must log in first.", "warning")
@@ -320,6 +346,7 @@ def delete_mentor(id):
 
     except Exception as e:
         db.session.rollback()
+        print(e)
         return jsonify({"error": str(e)}), 500
 
 #view mentor
@@ -329,25 +356,13 @@ def view_mentor():
     return render_template('viewMentor.html', mentors = mentors)
 
 
+'''
+@app.route('/quizzes')
+def quiz_list():
+    quizzes = Quiz.query.order_by(Quiz.created_at.desc()).all()
+    return render_template('quiz_list.html', quizzes=quizzes)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+'''
 # List All Quizzes
 @csrf.exempt
 @login_required
@@ -355,7 +370,8 @@ def view_mentor():
 def quiz_list():
     course_id = request.args.get('course_id', type=int)
     courses = Course.query.all()
-    
+    print(current_user.role)
+    print(current_user.id)
     if course_id:
         quizzes = Quiz.query.filter_by(course_id=course_id).all()
     else:
@@ -366,9 +382,10 @@ def quiz_list():
 # Create Quiz
 @csrf.exempt
 @login_required
+@role_required(['mentor', 'admin'])
 @app.route('/quiz/create', methods=['GET', 'POST'])
 def create_quiz():
-    if session.get('role') not in ['mentor', 'admin']:
+    if current_user.role not in ['mentor', 'admin']:
         flash('Only mentors or admins can create quizzes.', 'error')
         return redirect(url_for('login'))  # Or quiz list, as appropriate
     
@@ -376,8 +393,8 @@ def create_quiz():
         title = request.form.get('title')
         course_id = request.form.get('course_id',type=int)
         description = request.form.get('description')
-        time_limit = request.form.get('time_limit', type=int)
         language = request.form.get('language', 'en')
+        time_limit = request.form.get('time_limit', type=int)
         
         if not title or not course_id:
             flash('Title and course are required.', 'error')
@@ -394,20 +411,27 @@ def create_quiz():
             except:
                 flash('Translation failed, using original title.', 'warning')
         
-        quiz = Quiz(
+        if current_user.role == 'admin':
+            quiz = Quiz(
             title=title,
-            description=description,
-            time_limit=time_limit,
             course_id=course_id,
-            created_by=current_user.id,  # Uses User.id
-            created_at=datetime.utcnow(),
-            language=language
-        )
-
-        if current_user.role=="admin":
-            quiz.created_by_user_id=current_user.id
-        else:
-            quiz.created_by_mentor_id = current_user.id
+            description=description,
+            language=language,
+            time_limit=time_limit,
+            created_by_user_id=current_user.id,
+            created_at = datetime.utcnow(),
+    )
+        elif current_user.role == 'mentor':
+            quiz = Quiz(
+                title=title,
+                course_id=course_id,
+                description=description,
+                language=language,
+                time_limit=time_limit,
+                created_by_mentor_id = current_user.id,
+                created_at = datetime.utcnow(),
+            )
+    
         db.session.add(quiz)
         db.session.commit()
         
@@ -415,14 +439,25 @@ def create_quiz():
         questions_data = []
         i = 0
         while f'questions[{i}][text]' in request.form:
-            text = request.form.get(f'questions[{i}][text]')
-            options = request.form.getlist(f'questions[{i}][options][]')
-            correct_idx = request.form.get(f'questions[{i}][correct]', type=int)
+            text = request.form.get(f'questions[{i}][text]', '').strip()
+            options = [opt.strip() for opt in request.form.getlist(f'questions[{i}][options][]') if opt.strip()]
+            correct_idx = request.form.get(f'questions[{i}][correct]', type=int, default=0)
 
             if not text or len(options) < 2 or correct_idx is None or not (0 <= correct_idx < len(options)):
                 flash('Invalid question or option data.', 'error')
                 db.session.rollback()
-                return redirect(url_for('quiz.create_quiz'))
+                return redirect(url_for('create_quiz'))
+            
+            # Validate question
+            if not text:
+                flash(f'Question {i + 1} must have non-empty text.', 'error')
+                return redirect(url_for('quiz.edit_quiz', quiz_id=quiz_id))
+            if len(options) < 2:
+                flash(f'Question {i + 1} must have at least 2 non-empty options.', 'error')
+                return redirect(url_for('quiz.edit_quiz', quiz_id=quiz_id))
+            if correct_idx < 0 or correct_idx >= len(options):
+                flash(f'Question {i + 1} has an invalid correct option index.', 'error')
+                return redirect(url_for('quiz.edit_quiz', quiz_id=quiz_id))
             
             # Translate question and options
             if language != 'en':
@@ -466,156 +501,40 @@ def create_quiz():
             db.session.commit()
         
         flash('Quiz created successfully!', 'success')
-        return redirect(url_for('quiz.quiz_list'))
+        return redirect(url_for('quiz_list'))
     
     courses = Course.query.all()
     return render_template('create_quiz.html', courses=courses)
 
-# View Quiz Details
+
+# update Quiz
 @csrf.exempt
 @login_required
-@app.route('/quiz/<int:quiz_id>')
-def view_quiz(quiz_id):
-    quiz = Quiz.query.get_or_404(quiz_id)
-    # Cache quiz data for offline access
-    quiz_data = {
-        'id': quiz.id,
-        'title': quiz.title,
-        'course': quiz.course.name,
-        'questions': len(quiz.questions),
-        'level': quiz.course.level or 'Intermediate',
-        'estimated_time': len(quiz.questions) * 1  # 1 minute per question
-    }
-    return render_template('quiz_detail.html', quiz=quiz, quiz_data=quiz_data)
-
-# Attempt Quiz
-@csrf.exempt
-@login_required
-@app.route('/quiz/<int:quiz_id>/attempt', methods=['GET', 'POST'])
-def attempt_quiz(quiz_id):
-    if current_user.role not in ['student']:
-        flash('Only students can attempt quizzes.', 'error')
-        return redirect(url_for('quiz.quiz_list'))
-    quiz = Quiz.query.get_or_404(quiz_id)
-
-    if request.method == 'POST':
-        #check time limit
-        if quiz.time_limit:
-            attempt_start = datetime.utcnow()
-            if 'start_time' in request.form:
-                start_time = datetime.fromisoformat(request.form['start_time'])
-                if (datetime.utcnow() - start_time).seconds / 60 > quiz.time_limit:
-                    flash('Time limit exceeded.', 'error')
-                    return redirect(url_for('quiz.quiz_detail', quiz_id=quiz_id))
-                
-        attempt = QuizAttempt(
-            user_id=current_user.id,
-            quiz_id=quiz.id,
-            course_id = quiz.course_id,
-            attempted_at=datetime.utcnow()
-        )
-        db.session.add(attempt)
-        db.session.commit()
-        
-        #checking total socres
-        score = 0
-        total_questions = len(quiz.questions)
-        answers = request.form
-        for question in quiz.questions:
-            answer_key = f'answers[{question.id}]'
-            if answer_key not in answers:
-                flash('Please answer all questions.', 'error')
-                db.session.delete(attempt)
-                db.session.commit()
-                return redirect(url_for('quiz.attempt_quiz', quiz_id=quiz_id))
-            
-            selected_option_id = int(answers[answer_key])
-            selected_option = Option.query.get_or_404(selected_option_id)
-
-            if selected_option.question_id != question.id:
-                flash('Invalid option selected.', 'error')
-                db.session.delete(attempt)
-                db.session.commit()
-                return redirect(url_for('quiz.attempt_quiz', quiz_id=quiz_id))
-            if selected_option.is_correct:
-                 score += 1
-
-            answer = Answer(
-                attempt_id=attempt.id,
-                question_id=question.id,
-                selected_option_id=selected_option_id
-            )
-            db.session.add(answer)
-        attempt.score = (score / total_questions * 100) if total_questions > 0 else 0
-        db.session.commit()
-        
-        # Update or create Progress
-        progress = Progress.query.filter_by(user_id=current_user.id, course_id=quiz.course_id).first()
-        if not progress:
-            progress = Progress(
-                user_id=current_user.id,
-                course_id=quiz.course_id,
-                completion_percentage=0.0,
-                created_at=datetime.utcnow()
-            )
-            db.session.add(progress)
-        
-        # Update completion percentage (example: average quiz scores)
-        quiz_attempts = QuizAttempt.query.filter_by(user_id=current_user.id, course_id=quiz.course_id).all()
-        if quiz_attempts:
-            avg_score = sum(a.score for a in quiz_attempts) / len(quiz_attempts)
-            progress.completion_percentage = min(avg_score, 100.0)
-
-        # Award badge if score is high
-        if attempt.score >= 80:
-            badge = Badge.query.filter_by(name='Quiz Master').first()
-            if not badge:
-                badge = Badge(
-                    name='Quiz Master',
-                    description='Scored 80% or higher in a quiz',
-                    created_at=datetime.utcnow()
-                )
-                db.session.add(badge)
-                db.session.commit()
-            if badge not in progress.badges:
-                progress.badges.append(badge)
-
-        db.session.commit()
-        flash(f'Quiz completed! Your score: {score}/{total_questions} ({attempt.score:.2f}%', 'success')
-        return redirect(url_for('quiz_result', attempt_id=attempt.id))
-    
-    return render_template('attempt_quiz.html', quiz=quiz, start_time=datetime.utcnow().isoformat())
-
-# Edit Quiz
-@csrf.exempt
-@login_required
+@role_required(['mentor', 'admin'])
 @app.route('/quiz/<int:quiz_id>/edit', methods=['GET', 'POST'])
 def edit_quiz(quiz_id):
-    if current_user.role not in ['mentor', 'admin']:
-        flash('Only mentors or admins can edit quizzes.', 'error')
-        return redirect(url_for('quiz.quiz_list'))
-    
-    if (current_user.role == 'admin' and quiz.created_by_user_id != current_user.id) or \
-       (current_user.role == 'mentor' and quiz.created_by_mentor_id != current_user.id):
-        flash('You can only edit your own quizzes.', 'error')
-        return redirect(url_for('quiz.quiz_list'))
-    
     quiz = Quiz.query.get_or_404(quiz_id)
-    # if quiz.created_by != current_user.id:
+    # if current_user.role not in ['mentor', 'admin']:
+    #     flash('Only mentors or admins can edit quizzes.', 'error')
+    #     return redirect(url_for('quiz_list'))
+
+    # if current_user.role in ['mentor', 'admin']:
     #     flash('You can only edit your own quizzes.', 'error')
     #     return redirect(url_for('quiz_list'))
-    
+
     if request.method == 'POST':
+        # Collect form data
         quiz.title = request.form.get('title')
         quiz.description = request.form.get('description')
-        quiz.time_limit = request.form.get('time_limit', type=int)
-        quiz.course_id = request.form.get('course_id')
+        quiz.total_time = request.form.get('time_limit', type=int)
+        quiz.course_id = request.form.get('course_id', type=int)
         language = request.form.get('language', quiz.language or 'en')
-        
+
+        # Validate basic quiz data
         if not quiz.title or not quiz.course_id:
             flash('Title and course are required.', 'error')
-            return redirect(url_for('quiz.edit_quiz', quiz_id=quiz_id))
-        
+            return redirect(url_for('edit_quiz', quiz_id=quiz_id))
+
         # Translate title if language changed
         if language != (quiz.language or 'en'):
             try:
@@ -623,35 +542,34 @@ def edit_quiz(quiz_id):
                     'https://libretranslate.com/translate',
                     json={'q': quiz.title, 'source': 'en', 'target': language}
                 )
+    
                 quiz.title = response.json()['translatedText']
             except:
                 flash('Translation failed, using original title.', 'warning')
-        
-        # Delete existing questions and options
-        for question in quiz.questions:
-            db.session.delete(question)
-        db.session.commit()
-        
-        # Add new questions
+
+        # Collect and validate question data
         questions_data = []
         i = 0
         while f'questions[{i}][text]' in request.form:
             text = request.form.get(f'questions[{i}][text]')
             options = request.form.getlist(f'questions[{i}][options][]')
-            correct_idx = request.form.get(f'questions[{i}][correct]')
+            correct_idx = request.form.get(f'questions[{i}][correct]', type=int)
 
-            if not text or len(options) < 2 or correct_idx is None or not (0 <= correct_idx < len(options)):
-                flash('Invalid question or option data.', 'error')
-                return redirect(url_for('quiz.edit_quiz', quiz_id=quiz_id))
-            
+            # Skip empty questions (e.g., text is empty or no valid options)
+            if not text.strip() or len([opt for opt in options if opt.strip()]) < 2:
+                flash(f'Question {i + 1} must have text and at least 2 non-empty options.', 'error')
+                return redirect(url_for('edit_quiz', quiz_id=quiz_id))
+
             # Translate question and options
+            translated_text = text
+            translated_options = options
             if language != (quiz.language or 'en'):
                 try:
                     text_response = request.post(
                         'https://libretranslate.com/translate',
                         json={'q': text, 'source': 'en', 'target': language}
                     )
-                    text = text_response.json()['translatedText']
+                    translated_text = text_response.json()['translatedText']
                     translated_options = []
                     for opt in options:
                         opt_response = request.post(
@@ -659,21 +577,27 @@ def edit_quiz(quiz_id):
                             json={'q': opt, 'source': 'en', 'target': language}
                         )
                         translated_options.append(opt_response.json()['translatedText'])
-                    options = translated_options
                 except:
                     flash('Translation failed for question, using original text.', 'warning')
-            
+
             questions_data.append({
-                'text': text,
-                'options': options,
+                'text': translated_text,
+                'options': translated_options,
                 'correct': correct_idx
             })
             i += 1
-        
+
+        # Validate that at least one question exists
         if not questions_data:
-            flash('At least one question is required.', 'error')
+            flash('At least one valid question is required.', 'error')
             return redirect(url_for('edit_quiz', quiz_id=quiz_id))
-        
+
+        # Delete old questions only after validation
+        for q in quiz.questions:
+            db.session.delete(q)
+        db.session.commit()
+
+        # Add new questions
         for q_data in questions_data:
             question = Question(text=q_data['text'], quiz_id=quiz.id)
             db.session.add(question)
@@ -683,30 +607,31 @@ def edit_quiz(quiz_id):
                 option = Option(text=option_text, is_correct=is_correct, question_id=question.id)
                 db.session.add(option)
             db.session.commit()
-        
+
         quiz.language = language
         db.session.commit()
         flash('Quiz updated successfully!', 'success')
         return redirect(url_for('quiz_list'))
-    
+
+    # GET request
     courses = Course.query.all()
     return render_template('edit_quiz.html', quiz=quiz, courses=courses)
 
 # Delete Quiz
 @csrf.exempt
 @login_required
+@role_required(['mentor', 'admin'])
 @app.route('/quiz/<int:quiz_id>/delete', methods=['POST'])
 def delete_quiz(quiz_id):
-    if current_user.role not in ['mentor', 'admin']:
-        flash('Only mentors or admins can delete quizzes.', 'error')
-        return redirect(url_for('quiz.quiz_list'))
+    # if current_user.role not in ['mentor', 'admin']:
+    #     flash('Only mentors or admins can delete quizzes.', 'error')
+    #     return redirect(url_for('quiz_list'))
     
     quiz = Quiz.query.get_or_404(quiz_id)
 
-    if (current_user.role == 'admin' and quiz.created_by_user_id != current_user.id) or \
-       (current_user.role == 'mentor' and quiz.created_by_mentor_id != current_user.id):
-        flash('You can only delete your own quizzes.', 'error')
-        return redirect(url_for('quiz.quiz_list'))
+    # if current_user.role in ['mentor', 'admin']:
+    #     flash('You can only delete your own quizzes.', 'error')
+    #     return redirect(url_for('quiz_list'))
     
     # Optional: Add confirmation check
     if request.form.get('confirm') != 'yes':
@@ -717,6 +642,155 @@ def delete_quiz(quiz_id):
     db.session.commit()
     flash('Quiz deleted successfully!', 'success')
     return redirect(url_for('quiz_list'))
+
+# View Quiz Details
+@csrf.exempt
+@login_required
+@app.route('/quiz/<int:quiz_id>')
+def view_quiz(quiz_id):
+    quiz = Quiz.query.get_or_404(quiz_id)
+    # Cache quiz data for offline access
+    # quiz_data = {
+    #     'id': quiz.id,
+    #     'title': quiz.title,
+    #     'course': quiz.course.name,
+    #     'questions': len(quiz.questions),
+    #     'level': quiz.course.level or 'Intermediate',
+    #     'estimated_time':  quiz.time_limit,
+    # }
+    return render_template('quiz_detail.html', quiz=quiz)
+
+# Attempt Quiz
+@csrf.exempt
+@login_required
+@app.route('/quiz/<int:quiz_id>/attempt', methods=['GET', 'POST'])
+def attempt_quiz(quiz_id):
+    quiz = Quiz.query.get_or_404(quiz_id)
+
+    # Ensure only students can attempt quizzes
+    if current_user.role != 'student':
+        flash('Only students can attempt quizzes.', 'error')
+        return redirect(url_for('quiz.quiz_list'))
+
+    # On GET request, initialize the start time for the quiz
+    if request.method == 'GET':
+        session['quiz_start_time'] = datetime.utcnow().isoformat()  # Ensure this is a string
+        return render_template('attempt_quiz.html', quiz=quiz, start_time=session['quiz_start_time'])
+
+    # On POST request, handle quiz attempt submission
+    if request.method == 'POST':
+        # Retrieve and parse the start time from session
+        try:
+            start_time = datetime.fromisoformat(session.get('quiz_start_time', ''))
+        except ValueError:
+            flash('Invalid session start time.', 'error')
+            return redirect(url_for('view_quiz', quiz_id=quiz_id))
+
+        # Check for time limit
+        if quiz.time_limit:
+            time_taken = (datetime.utcnow() - start_time).seconds / 60  # Convert to minutes
+            if time_taken > quiz.time_limit:
+                flash('Time limit exceeded.', 'error')
+                return redirect(url_for('attempt_quiz', quiz_id=quiz_id))
+
+        try:
+            # Create a new quiz attempt record
+            attempt = QuizAttempt(
+                user_id=current_user.id,
+                quiz_id=quiz.id,
+                course_id=quiz.course_id,
+                attempted_at=datetime.utcnow()
+            )
+            db.session.add(attempt)
+            db.session.commit()
+
+            # Initialize score and retrieve all questions and answers from the form
+            score = 0
+            questions = quiz.questions
+            total_questions = len(questions)
+            answers = request.form
+
+            for question in questions:
+                answer_key = f'answers[{question.id}]'
+                if answer_key not in answers:
+                    flash('Please answer all questions.', 'error')
+                    db.session.delete(attempt)  # Clean up attempt if incomplete
+                    db.session.commit()
+                    return redirect(url_for('attempt_quiz', quiz_id=quiz_id))
+
+                selected_option_id = int(answers[answer_key])
+                selected_option = Option.query.get_or_404(selected_option_id)
+
+                # Ensure that the selected option belongs to the correct question
+                if selected_option.question_id != question.id:
+                    flash('Invalid option selected.', 'error')
+                    db.session.delete(attempt)  # Clean up attempt if invalid selection
+                    db.session.commit()
+                    return redirect(url_for('attempt_quiz', quiz_id=quiz_id))
+
+                # Calculate the score based on correct answers
+                if selected_option.is_correct:
+                    score += 1
+
+                # Record the answer in the database
+                answer = Answer(
+                    attempt_id=attempt.id,
+                    user_id=current_user.id,
+                    quiz_id=quiz.id,
+                    question_id=question.id,
+                    selected_option_id=selected_option_id,
+                    timestamp=datetime.utcnow()
+                )
+                db.session.add(answer)
+
+            # Calculate the percentage score and update the attempt record
+            attempt.score = (score / total_questions * 100) if total_questions > 0 else 0
+            db.session.commit()
+
+            # Update or create Progress
+            progress = Progress.query.filter_by(user_id=current_user.id, course_id=quiz.course_id).first()
+            if not progress:
+                progress = Progress(
+                    user_id=current_user.id,
+                    course_id=quiz.course_id,
+                    completion_percentage=0.0,
+                    created_at=datetime.utcnow()
+                )
+                db.session.add(progress)
+                db.session.commit()
+
+            # Update completion percentage based on average quiz scores
+            quiz_attempts = QuizAttempt.query.filter_by(user_id=current_user.id, course_id=quiz.course_id).all()
+            if quiz_attempts:
+                avg_score = sum(a.score for a in quiz_attempts) / len(quiz_attempts)
+                progress.completion_percentage = min(avg_score, 100.0)
+
+            # Award badge if score is high
+            if attempt.score >= 80:
+                badge = Badge.query.filter_by(name='Quiz Master').first()
+                if not badge:
+                    badge = Badge(
+                        name='Quiz Master',
+                        description='Scored 80% or higher in a quiz',
+                        created_at=datetime.utcnow()
+                    )
+                    db.session.add(badge)
+                    db.session.commit()
+                if badge not in progress.badges:
+                    progress.badges.append(badge)
+
+            db.session.commit()
+
+            flash(f'Quiz completed! Your score: {score}/{total_questions} ({attempt.score:.2f}%)', 'success')
+            return redirect(url_for('quiz_result', attempt_id=attempt.id))
+
+        except Exception as e:
+            # Rollback in case of an error to maintain data integrity
+            db.session.rollback()
+            flash('An error occurred while submitting your quiz. Please try again.', 'error')
+            return redirect(url_for('attempt_quiz', quiz_id=quiz_id))
+
+    return redirect(url_for('quiz_detail', quiz_id=quiz_id))
 
 # View Quiz Result
 @csrf.exempt
@@ -751,39 +825,6 @@ def user_attempts():
     """List all quiz attempts for the current user."""
     attempts = QuizAttempt.query.filter_by(user_id=current_user.id).all()
     return render_template('user_attempts.html', attempts=attempts)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # Add course
@@ -841,8 +882,8 @@ def create_course():
                 if video_file:
                     filename = secure_filename(video_file.filename)
                     video_path = os.path.join(UPLOAD_FOLDER, filename)
+                    module.video_path = filename
                     video_file.save(video_path)
-
                     submodule = SubModule(name=sub_name, video_path=video_path, module_id=module.id)
                     db.session.add(submodule)
 
@@ -854,7 +895,6 @@ def create_course():
 @app.route('/course/<int:id>/update', methods=['GET','POST'])
 def update_course(id):
     course = Course.query.get_or_404(id)
-    print(course)
     if request.method == 'GET':
         # the below line is used to get the courses that the student is already enrolled in.
         return render_template('updateCourse.html', course=course)
@@ -913,13 +953,74 @@ def view_course(id):
         })
     return render_template('aboutCourse.html', course=course, modules=course_data)
 
+#learn course
+@app.route('/user/<int:id>/learn', methods=['GET', 'POST'])
+def learnCourse(id):
+    course = Course.query.get_or_404(id)
+    modules = course.modules  # All related modules
+    video_urls = []
+    for module in modules:
+        video_urls.append(module.submodules)
+    print(video_urls)
+    return render_template('learn.html', course=course, modules=modules, video_urls=video_urls)
 
+# # Route to serve the chatbot interface
+# @app.route('/chat')
+# def chat():
+#     return render_template('index.html')
+
+# # Route to handle chatbot queries
+# @app.route('/api/chat', methods=['POST'])
+# def chat():
+#     user_message = request.json.get('message')  # Get the user's message
+#     if not user_message:
+#         return jsonify({'error': 'No message provided'}), 400
+
+#     # Print the user message for debugging
+#     print(f"Received user message: {user_message}")
+
+#     # Call Groq API or another chatbot API to get the response
+#     groq_url = 'https://api.groq.com/openai/v1/chat/completions'
+#     headers = {
+#         'Content-Type': 'application/json',
+#         'Authorization': 'Bearer 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',  # Replace with your Groq API key
+#     }
+
+#     payload = {
+#         'model': 'llama3-8b-8192',  # Replace with the correct model name if needed
+#         'messages': [{'role': 'user', 'content': user_message}],
+#         'max_tokens': 150,
+#         'temperature': 0.7
+#     }
+
+#     # Print the payload to check if it's correct
+#     print(f"Payload sent to Groq API: {payload}")
+
+#     response = requests.post(groq_url, json=payload, headers=headers)
+
+#     if response.status_code == 200:
+#         response_data = response.json()
+#         chatbot_reply = response_data['choices'][0]['message']['content']
+#         print(f"Chatbot reply: {chatbot_reply}")
+#         return jsonify({'reply': chatbot_reply})
+#     else:
+#         return jsonify({'error': 'Error from Groq API'}), response.status_code
+
+
+
+@app.route('/static/<int:id>/uploads', methods=['GET','POST'])
+def video_url(id):
+    sub_module = SubModule.query.filter_by(id = id).first()
+    return render_template('learn.html', sub_module=sub_module)
+'''
+ {% for video_path in video_urls %}
+          {{ video_path[0].video_path }}
+        {% endfor %}
+'''
 @app.route('/logout')
 def logout():
     session.pop('username', None)
     return redirect(url_for('login'))
-
-
 
 @app.route('/forgetpassword', methods=['GET', 'POST'])
 def forgetpassword():
@@ -936,10 +1037,7 @@ def forgetpassword():
             otp = str(random.randint(100000, 999999))
             session['reset_email'] = email
             session['otp'] = otp
-            msg = Message(
-                subject = "OTP for verification",
-                recipients = [email]
-            )
+            msg = Message(subject='OTP verification email', recipients = [email])
             
             try:
                 # msg.html = render_template('otp_email.html', otp=otp)
@@ -1008,6 +1106,31 @@ def requestResetPassword():
     return render_template("requestResetPassword.html", form=form)
 
 
+# # accessing all the offline content
+# @app.route('/api/user/<int:user_id>/courses')
+# @login_required
+# def user_courses(user_id):
+#     user = User.query.get_or_404(user_id)
+#     courses = Course.query.filter(Course.name.ilike(f"%{user.interest}%")).all()
+#     return jsonify([{"id": c.id, "name": c.name} for c in courses])
+
+# @app.route('/api/user/<int:user_id>/quizzes')
+# @login_required
+# def user_quizzes(user_id):
+#     quizzes = Quiz.query.filter_by(user_id=user_id).all()
+#     return jsonify([{"id": q.id, "title": q.title, "score": q.score} for q in quizzes])
+
+# @app.route('/api/user/<int:user_id>/notes')
+# @login_required
+# def user_notes(user_id):
+#     notes = Note.query.filter_by(user_id=user_id).all()
+#     return jsonify([{"id": n.id, "title": n.title, "content": n.content} for n in notes])
+
+# @app.route('/userDashboard', methods=['GET', 'POST'])
+# @login_required
+# def userDashboard():
+#     user = User.query.get_or_404()
+#     return render_template('userDashboard.html')
 
 
 if __name__ == "__main__":
