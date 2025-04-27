@@ -137,7 +137,10 @@ def create_admin():
     else:
         print("ℹ️ Admin user already exists.")
 
-
+ with app.app_context():
+        db.create_all()
+        create_admin()
+     
 @app.route('/')
 def LandingPage():
     return render_template('LandingPage.html')
@@ -1231,9 +1234,7 @@ def requestResetPassword():
 
 
 if __name__ == "__main__":
-    with app.app_context():
-        db.create_all()
-        create_admin()
+   
     app.run(debug=True)
 
 
