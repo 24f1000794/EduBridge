@@ -1,6 +1,6 @@
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, ValidationError, validators,SubmitField,SelectField,SelectMultipleField,EmailField
+from wtforms import StringField, PasswordField, TextAreaField, ValidationError, validators,SubmitField,SelectField,SelectMultipleField,EmailField
 
 
 class RegistrationForm(FlaskForm):
@@ -21,16 +21,12 @@ class RegistrationForm(FlaskForm):
         ('physics', 'Physics'),
         ('chemistry', 'Chemistry'),
         ('maths', 'Maths'),
-        ('cs', 'Computer Science')
+        ('computer science', 'Computer Science')
     ],
     validators=[validators.DataRequired()]
 )
     date_of_birth = StringField('Date of Birth', [validators.DataRequired()])
-    role = SelectField(
-    "Role",
-    choices=[('student', 'Student'), ('admin', 'Admin')],
-    validators=[validators.DataRequired()]
-)
+    
     submit = SubmitField('Submit')
 
     def validate_confirm_password(self, field):
@@ -78,3 +74,7 @@ class requestResetPasswordForm(FlaskForm):
             raise ValidationError('Passwords must match.')
     
 
+# Form for sending messages
+class MessageForm(FlaskForm):
+    content = TextAreaField('Message', validators=[validators.DataRequired()])
+    submit = SubmitField('Send')
