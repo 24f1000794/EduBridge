@@ -35,7 +35,7 @@ socketio = SocketIO(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'  # Redirect here if user not logged in
-
+GROQ_API_KEY = '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'
 
 UPLOAD_FOLDER = 'static/uploads/' 
 
@@ -137,10 +137,10 @@ def create_admin():
     else:
         print("ℹ️ Admin user already exists.")
 
- with app.app_context():
-        db.create_all()
-        create_admin()
-     
+with app.app_context():
+    db.create_all()
+    create_admin()
+
 @app.route('/')
 def LandingPage():
     return render_template('LandingPage.html')
