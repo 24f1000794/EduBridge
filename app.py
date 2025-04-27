@@ -33,6 +33,11 @@ bcrypt = Bcrypt(app)
 mail = Mail(app)
 socketio = SocketIO(app)
 # mail.init_app(app)
+
+with app.app_context():
+    db.create_all()
+    create_admin()
+    
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'  # Redirect here if user not logged in
@@ -1168,9 +1173,6 @@ def requestResetPassword():
 
 
 if __name__ == "__main__":
-    with app.app_context():
-        db.create_all()
-        create_admin()
     app.run(debug=True)
 
 
