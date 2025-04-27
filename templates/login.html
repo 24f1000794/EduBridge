@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EduBridge Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+    <style>
+        body {
+            background-color: #f3e8ff;
+            color: #4a0072;
+            font-family: Arial, sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .navbar {
+            background-color: #6a1b9a;
+        }
+        .navbar-brand, .nav-link {
+            color: white;
+        }
+        .navbar-nav .nav-link:hover {
+            color: #e1bee7;
+        }
+        .form-container {
+            max-width: 600px;
+            margin: 40px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .form-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        }
+        .btn-primary {
+            background-color: #6a1b9a;
+            border-color: #6a1b9a;
+        }
+        .btn-primary:hover {
+            background-color: #4a0072;
+            border-color: #4a0072;
+        }
+        .dark-mode {
+            background-color: #1e1e2f;
+            color: #d1c4e9;
+        }
+        .dark-mode .navbar {
+            background-color: #2c2c3e;
+        }
+        .dark-mode .navbar-brand, .dark-mode .nav-link {
+            color: #d1c4e9;
+        }
+        .dark-mode .form-container {
+            background: #2a2a3c;
+            color: #d1c4e9;
+            box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1);
+        }
+        .dark-mode .btn-primary {
+            background-color: #7e57c2;
+            border-color: #7e57c2;
+        }
+        .dark-mode .btn-primary:hover {
+            background-color: #5e35b1;
+            border-color: #5e35b1;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('LandingPage') }}">EduBridge</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <!-- <li class="nav-item">
+                        <a class="nav-link active" href="#">Login</a>
+                    </li> -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('register') }}">Register</a>
+                    </li>
+                </ul>
+                <button class="btn btn-outline-light ms-3" id="toggle-dark-mode">Toggle Dark Mode</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container form-container">
+        <h1 class="text-center mb-4">Login</h1>
+
+        <!-- Display flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <p class="alert alert-{{ category }}">{{ message }}</p>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <form action="{{ url_for('login') }}" method="POST">
+            {{ form.hidden_tag() }}
+            <div class="mb-3">
+                <label for="username" class="form-label">{{ form.username.label }}</label>
+                {{ form.username(type="text", class="form-control") }}
+                {% if form.username.errors %}
+                <ul class="text-danger">
+                    {% for error in form.username.errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">{{ form.password.label }}</label>
+                {{ form.password(type="password", class="form-control") }}
+                {% if form.password.errors %}
+                <ul class="text-danger">
+                    {% for error in form.password.errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+            <div class="text-center">
+                {{ form.submit(class="btn btn-primary") }}
+                <p class="mt-3">
+                    <a href="{{ url_for('register') }}">Don't have an account? Register</a> |
+                    <a href="{{ url_for('forgetpassword') }}">Forgot Password?</a>
+                </p>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Dark/Light Mode Toggle
+        const toggleButton = document.getElementById("toggle-dark-mode");
+        toggleButton.addEventListener("click", () => {
+            document.body.classList.toggle("dark-mode");
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldnv0O8t5Ew5xgkIoE5zF6pGxg5k5t5g5t5g5t5" crossorigin="anonymous"></script>
+</body>
+
+</html>

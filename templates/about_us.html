@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>About Us - EduBridge</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Segoe UI", sans-serif;
+        background-color: #f8f9fa;
+        color: #4a0072;
+        transition: background-color 0.3s, color 0.3s;
+        scroll-behavior: smooth;
+      }
+
+      .dark-mode {
+        background-color: #2c2c3f;
+        color: #f3e8ff;
+      }
+
+      .toggle-dark {
+        background-color: #6a1b9a;
+        position: absolute;
+        right: 10px;
+        border: none;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 25px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: transform 0.3s ease;
+      }
+
+      .toggle-dark:hover {
+        transform: scale(1.1);
+      }
+
+      .container {
+        margin-top: 60px;
+        padding-bottom: 40px;
+      }
+
+      .section-heading {
+        text-align: center;
+        margin-bottom: 40px;
+        font-size: 2.2rem;
+        font-weight: bold;
+      }
+
+      .team-card {
+        flex: 1 1 calc(25% - 40px);
+        max-width: 300px;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        padding: 20px;
+        text-align: center;
+        margin: 20px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .team-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      }
+
+      .team-card img {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-bottom: 15px;
+        transition: transform 0.3s ease;
+      }
+
+      .team-card:hover img {
+        transform: scale(1.1);
+      }
+
+      .team-card h5 {
+        margin-top: 10px;
+        font-size: 1.4rem;
+        font-weight: 600;
+      }
+
+      .team-card p {
+        color: #6a1b9a;
+        margin-bottom: 20px;
+        font-size: 1rem;
+      }
+
+      .dark-mode .team-card p {
+        color:rgb(125, 11, 108);
+        /* Gradient purple color */
+        background: linear-gradient(to right, #a78bfa, #d8b4fe);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .dark-mode .team-card {
+        background: #333;
+        box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+      }
+
+      .team-card small {
+        font-size: 0.9rem;
+        color: #555;
+      }
+
+      .dark-mode small {
+        color: #aaa;
+      }
+
+      .team-wrapper {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 20px;
+      }
+
+      .section-bg {
+        background-color: #f3e8ff;
+        padding: 30px 0;
+      }
+
+      .dark-mode .section-bg {
+        background-color: #333;
+      }
+
+      @media (max-width: 768px) {
+        .team-card {
+          flex: 1 1 calc(50% - 20px);
+        }
+      }
+
+      @media (max-width: 576px) {
+        .team-card {
+          flex: 1 1 100%;
+        }
+      }
+
+      /* Navbar styles */
+      .navbar {
+        background-color: #6a1b9a;
+      }
+
+      .navbar-brand,
+      .nav-link {
+        color: white;
+      }
+
+      .navbar-nav .nav-link:hover {
+        color: #e1bee7;
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="LandingPage.html">EduBridge</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <!-- Dark Mode Toggle Button -->
+          <button class="toggle-dark" onclick="toggleDarkMode()">
+            🌙 Toggle Dark Mode
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- About Us Section -->
+    <div class="container">
+      <div class="section-bg">
+        <h2 class="section-heading">About EduBridge</h2>
+        <p class="text-center">
+          <strong>EduBridge</strong> is an AI-powered education platform
+          designed to bridge the gap between urban and rural learners. We offer
+          multilingual, personalized content, offline access, and mentorship to
+          students everywhere, making education accessible to all.
+        </p>
+      </div>
+
+      <!-- Team Section -->
+      <div class="section-bg">
+        <h3 class="section-heading">Meet Our Team</h3>
+        <div class="team-wrapper">
+          <div class="team-card">
+            <img src="{{ url_for('static', filename='images/pranshu.jpg') }}" alt="Pranshu Batham" />
+            <h5>Pranshu Batham</h5>
+            <p>Full-Stack Developer</p>
+            <small></small>
+          </div>
+          <div class="team-card">
+            <img src="{{ url_for('static', filename='images/aryan.jpg') }}" alt="Aryan Gupta" />
+            <h5>Aryan Gupta</h5>
+            <p>Frontend Developer</p>
+            <small></small>
+          </div>
+          <div class="team-card">
+            <img src="{{ url_for('static', filename='images/shivansh.jpg') }}" alt="Shivansh Kushwaha" />
+            <h5>Shivansh Kushwaha</h5>
+            <p>UI / UX DEVELOPMENT</p>
+            <small></small>
+          </div>
+          <div class="team-card">
+            <img src="{{ url_for('static', filename='images/anmol.jpg') }}" alt="Anmol" />
+            <h5>Anmol</h5>
+            <p>Content Manager</p>
+            <small></small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function toggleDarkMode() {
+        document.body.classList.toggle("dark-mode");
+      }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>
