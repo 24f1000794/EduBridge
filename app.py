@@ -33,10 +33,6 @@ bcrypt = Bcrypt(app)
 mail = Mail(app)
 socketio = SocketIO(app)
 # mail.init_app(app)
-
-with app.app_context():
-    db.create_all()
-    create_admin()
     
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -142,6 +138,9 @@ def create_admin():
     else:
         print("ℹ️ Admin user already exists.")
 
+with app.app_context():
+    db.create_all()
+    create_admin()
 
 @app.route('/')
 def LandingPage():
