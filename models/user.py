@@ -44,33 +44,9 @@ class User(db.Model, UserMixin):
     messages_sent = db.relationship('Messages', backref='sender', lazy='dynamic', foreign_keys='Messages.sender_id')
     messages_received = db.relationship('MentorMessages', backref='receiver', lazy='dynamic', foreign_keys='MentorMessages.receiver_id')
 
-
     def __repr__(self):
         return f"<User {self.username}>"
-    # # Relationships
-    # progress_entries = db.relationship('Progress', back_populates='user', lazy='dynamic')  # Renamed
-    # messages_sent = db.relationship('Message', backref='sender', lazy='dynamic', foreign_keys='Message.sender_id')
-    # notes = db.relationship('Note', backref='uploader', lazy='dynamic')
-    # quizzes_created_as_admin = db.relationship('Quiz', foreign_keys='Quiz.created_by_user_id', backref='admin_creator', lazy='dynamic')
 
-    def __repr__(self):
-        return f"<User {self.username}>"
-    
-    # def get_id(self):
-    #     return f"user:{self.id}"
-    # def role(self):
-    #     return self.role  # or 'student', depending on your logic
-
-    
-    
-    # def __init__(self, username, fullname, email, password, qualification, dob):
-    #     self.username = username
-    #     self.fullname = fullname
-    #     self.email = email
-    #     #self.password = generate_password_hash(password)
-    #     self.qualification = qualification
-    #     self.dob = dob
-    #     self.is_active = True  
 
 class Course(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -264,12 +240,7 @@ class QuizAttempt(db.Model):
     completed = db.Column(db.Boolean, default=False)
     progress_id = db.Column(db.Integer, db.ForeignKey('progress.id'), nullable=True)  
 
-    # Relationships
-    # user = db.relationship('User', backref='quiz_attempts')
-    # quiz = db.relationship('Quiz', backref='attempts', lazy='dynamic')
-    # course = db.relationship('Course', backref='course_attempts', lazy='dynamic')  # Changed backref
-    # progress = db.relationship('Progress', backref='quiz_attempt', uselist=False)
-    # answers = db.relationship('Answer', backref='attempt', lazy='dynamic', cascade='all, delete-orphan')
+   
     # Relationships
     user = db.relationship('User', back_populates='quiz_attempts', overlaps="quiz_user")
     # quiz = db.relationship('Quiz', backref='quiz_attempts')
