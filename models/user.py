@@ -5,18 +5,18 @@ from flask_login import UserMixin
 
 
 # # Association Table: User ↔ Mentor
-# user_mentor_association = db.Table(
-#     'user_mentor_association',
-#     db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
-#     db.Column('mentor_id', db.Integer, db.ForeignKey('mentor.id'))
-# )
+user_mentor_association = db.Table(
+    'user_mentor_association',
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
+    db.Column('mentor_id', db.Integer, db.ForeignKey('mentor.id'))
+)
 
 # # Association Table: Mentor ↔ Course
-# mentor_course_association = db.Table(
-#     'mentor_course_association',
-#     db.Column('mentor_id', db.Integer, db.ForeignKey('mentor.id')),
-#     db.Column('course_id', db.Integer, db.ForeignKey('course.id'))
-# )
+mentor_course_association = db.Table(
+    'mentor_course_association',
+    db.Column('mentor_id', db.Integer, db.ForeignKey('mentor.id')),
+    db.Column('course_id', db.Integer, db.ForeignKey('course.id'))
+)
 
 # Association table for Progress-Badge many-to-many relationship
 progress_badges = db.Table('progress_badges',
@@ -40,9 +40,37 @@ class User(db.Model, UserMixin):
     quiz_attempts = db.relationship('QuizAttempt', backref='quiz_user', lazy='dynamic')
     answers = db.relationship('Answer', backref='answer_user', lazy='dynamic')
     quizzes_created = db.relationship('Quiz', backref='creator', lazy='dynamic', foreign_keys='Quiz.created_by_user_id')
+    mentors = db.relationship('Mentor', secondary=user_mentor_association, back_populates='students')
+    messages_sent = db.relationship('Messages', backref='sender', lazy='dynamic', foreign_keys='Messages.sender_id')
+    messages_received = db.relationship('MentorMessages', backref='receiver', lazy='dynamic', foreign_keys='MentorMessages.receiver_id')
+
 
     def __repr__(self):
         return f"<User {self.username}>"
+    # # Relationships
+    # progress_entries = db.relationship('Progress', back_populates='user', lazy='dynamic')  # Renamed
+    # messages_sent = db.relationship('Message', backref='sender', lazy='dynamic', foreign_keys='Message.sender_id')
+    # notes = db.relationship('Note', backref='uploader', lazy='dynamic')
+    # quizzes_created_as_admin = db.relationship('Quiz', foreign_keys='Quiz.created_by_user_id', backref='admin_creator', lazy='dynamic')
+
+    def __repr__(self):
+        return f"<User {self.username}>"
+    
+    # def get_id(self):
+    #     return f"user:{self.id}"
+    # def role(self):
+    #     return self.role  # or 'student', depending on your logic
+
+    
+    
+    # def __init__(self, username, fullname, email, password, qualification, dob):
+    #     self.username = username
+    #     self.fullname = fullname
+    #     self.email = email
+    #     #self.password = generate_password_hash(password)
+    #     self.qualification = qualification
+    #     self.dob = dob
+    #     self.is_active = True  
 
 class Course(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -58,7 +86,8 @@ class Course(db.Model):
     progress = db.relationship('Progress', back_populates='course', lazy='dynamic')
     notes = db.relationship('Note', backref='course', lazy='dynamic',cascade='all, delete-orphan')
     quiz_attempts = db.relationship("QuizAttempt", backref="quiz_course", lazy="dynamic")
-    # mentors = db.relationship('Mentor', secondary=mentor_course_association, back_populates='courses')
+    mentors = db.relationship('Mentor', secondary=mentor_course_association, back_populates='courses')
+
 
 class Module(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -84,6 +113,13 @@ class Progress(db.Model):
     score = db.Column(db.Float, nullable=False)  # Score out of 100
     completion_percentage = db.Column(db.Float, default=0.0)  # % of course completed
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # # Relationships
+    user = db.relationship('User', backref='progress')
+    # quiz = db.relationship('Quiz', backref='progress')
+    # course = db.relationship('Course', backref='progress_records', lazy='dynamic')
+    badges = db.relationship('Badge', secondary='progress_badges', backref='progress')
+    # quiz_attempt = db.relationship('QuizAttempt', backref='progress_entry', uselist=False)  # Updated backref name
 
    # Relationships
     #user = db.relationship('User', back_populates='progress_entries', lazy='select')  # Changed to lazy='select'
@@ -117,12 +153,12 @@ class Mentor(db.Model, UserMixin):
     role = db.Column(db.String(80), default='mentor')
     #role=db.Column(db.String(50), default='mentor')
     # Relationships
-    # courses = db.relationship('Course', secondary=mentor_course_association, back_populates='mentors')
+    courses = db.relationship('Course', secondary=mentor_course_association, back_populates='mentors')
     messages_received = db.relationship('Messages', backref='receiver', lazy='dynamic', foreign_keys='Messages.receiver_id')
+    messages_sent = db.relationship('MentorMessages', backref='sender', lazy='dynamic', foreign_keys='MentorMessages.sender_id')
     quizzes_created_as_mentor = db.relationship('Quiz', foreign_keys='Quiz.created_by_mentor_id', lazy='dynamic')
-
     notes_uploaded = db.relationship('Note', backref='mentor_uploader', lazy='dynamic')
-    # students = db.relationship('User', secondary=user_mentor_association, back_populates='mentors')
+    students = db.relationship('User', secondary=user_mentor_association, back_populates='mentors')
     # @property
     # def role(self):
     #     return self.role
@@ -132,11 +168,23 @@ class Mentor(db.Model, UserMixin):
 
 class Messages(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    sender_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    receiver_id = db.Column(db.Integer, db.ForeignKey('mentor.id'))
+    sender_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    receiver_id = db.Column(db.Integer, db.ForeignKey('mentor.id'), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    def __repr__(self):
+        return f'<Message from user_id={self.sender_id} to mentor_id={self.receiver_id}>'
+
+class MentorMessages(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    sender_id = db.Column(db.Integer, db.ForeignKey('mentor.id'), nullable=False)
+    receiver_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     content = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
+    def __repr__(self):
+        return f'<MentorMessage from mentor_id={self.sender_id} to user_id={self.receiver_id}>'
+    
 class Note(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(150), nullable=False)
@@ -169,7 +217,7 @@ class Quiz(UserMixin,db.Model):
     attempts = db.relationship('QuizAttempt', back_populates='quiz', lazy='dynamic', cascade='all, delete-orphan')
     #attempts = db.relationship('QuizAttempt', back_populates='quiz')
     answers = db.relationship('Answer', backref='quiz', lazy='dynamic')
-    created_by_mentor  = db.relationship('Mentor', foreign_keys=[created_by_mentor_id], backref='quizzes_created')
+    created_by_mentor = db.relationship('Mentor', foreign_keys=[created_by_mentor_id], backref=db.backref('mentor_quizzes', lazy='dynamic', overlaps="quizzes_created_as_mentor"), overlaps="quizzes_created_as_mentor")
     
 
     __table_args__ = (
@@ -209,19 +257,25 @@ class QuizAttempt(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     quiz_id = db.Column(db.Integer, db.ForeignKey('quiz.id'), nullable=False)
-    course_id = db.Column(db.Integer, db.ForeignKey('course.id'), nullable=False) 
+    course_id = db.Column(db.Integer, db.ForeignKey('course.id'), nullable=False)  # e.g., Maths, Science
     score = db.Column(db.Integer, default=0)  
     attempted_at = db.Column(db.DateTime, default=datetime.utcnow)
-    time_taken = db.Column(db.Integer, nullable=True)  
+    time_taken = db.Column(db.Integer, nullable=True)  # Time taken in seconds
     completed = db.Column(db.Boolean, default=False)
     progress_id = db.Column(db.Integer, db.ForeignKey('progress.id'), nullable=True)  
 
-   
     # Relationships
-    user = db.relationship('User', back_populates='quiz_attempts')
+    # user = db.relationship('User', backref='quiz_attempts')
+    # quiz = db.relationship('Quiz', backref='attempts', lazy='dynamic')
+    # course = db.relationship('Course', backref='course_attempts', lazy='dynamic')  # Changed backref
+    # progress = db.relationship('Progress', backref='quiz_attempt', uselist=False)
+    # answers = db.relationship('Answer', backref='attempt', lazy='dynamic', cascade='all, delete-orphan')
+    # Relationships
+    user = db.relationship('User', back_populates='quiz_attempts', overlaps="quiz_user")
+    # quiz = db.relationship('Quiz', backref='quiz_attempts')
     quiz = db.relationship('Quiz', back_populates='attempts')
-    course = db.relationship('Course', back_populates='quiz_attempts')
-    progress = db.relationship('Progress', back_populates='quiz_attempts', uselist=False)
+    course = db.relationship('Course', back_populates='quiz_attempts', overlaps="quiz_course")
+    progress = db.relationship('Progress', back_populates='quiz_attempts', uselist=False, overlaps="progress_record")
     answers = db.relationship('Answer', backref='attempt', lazy='dynamic', cascade='all, delete-orphan')
 
     def __repr__(self):
