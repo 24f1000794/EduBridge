@@ -27,7 +27,7 @@ progress_badges = db.Table('progress_badges',
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(150), unique=True, nullable=False)
-    fullname = db.Column(db.String(150), unique=True, nullable=False)
+    fullname = db.Column(db.String(150), nullable=False)
     email = db.Column(db.String(150), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
     qualification = db.Column(db.String(200), nullable = False)
