@@ -145,6 +145,10 @@ with app.app_context():
 def LandingPage():
     return render_template('LandingPage.html')
 
+@app.route('/about')
+def about():
+    return render_template('about_us.html')
+
 @app.route('/user/register', methods=['GET', 'POST'])
 def register():
     # form = RegistrationForm(request.form)
@@ -300,11 +304,47 @@ def mentor_dashboard(id):
     #if 'username' in session and session.get('role') == 'mentor':
     print(current_user.role)
     if current_user.role == 'mentor':
-        return render_template('mentor_dashborad.html', mentor_name = mentor.fullname, messages=messages)
+        # Fetch all student-to-mentor messages where the mentor is the receiver
+        student_messages = Messages.query.filter_by(receiver_id=current_user.id).all()
+    # Fetch all mentor-to-student messages where the mentor is the sender
+        mentor_messages = MentorMessages.query.filter_by(sender_id=current_user.id).all()
+
+    # Combine messages and group by student
+        conversations = {}
+        for message in student_messages + mentor_messages:
+        # Determine student ID based on message direction
+           student_id = message.sender_id if message.__class__.__name__ == 'Messages' else message.receiver_id
+           student = User.query.get(student_id)
+           if not student:
+              continue
+
+           if student_id not in conversations:
+            conversations[student_id] = {
+                'student_name': student.fullname,
+                'messages': []
+            }
+        
+            conversations[student_id]['messages'].append(message)
+
+    # Sort messages within each conversation by timestamp
+        for convo in conversations.values():
+           convo['messages'].sort(key=lambda x: x.timestamp)
+
+        return render_template(
+            'mentor_dashborad.html',
+        mentor_name=current_user.fullname,
+        conversations=conversations,
+        # mentor_name = mentor.fullname, messages=messages
+
+    )
+    
     else:
         flash("You must log in first.", "warning")
         return redirect(url_for('login'))
-
+    
+      
+    
+    
 @app.route('/AdminDashboard', methods=['GET'])
 @login_required 
 def AdminDashboard():
@@ -1071,7 +1111,6 @@ def chat_with_mentor(mentor_id):
 @app.route('/mentor/reply_to_student/<int:student_id>', methods=['GET', 'POST'])
 @login_required
 def reply_to_student(student_id):
-    # Restrict to mentors only
     if current_user.role != 'mentor':
         flash("Only mentors can reply to students.", "danger")
         return redirect(url_for('LandingPage'))
@@ -1082,8 +1121,8 @@ def reply_to_student(student_id):
     if form.validate_on_submit():
         content = form.content.data
         message = MentorMessages(
-            sender_id=current_user.id,  # Mentor's ID
-            receiver_id=student.id,     # Student's ID
+            sender_id=current_user.id,
+            receiver_id=student.id,
             content=content,
             timestamp=datetime.utcnow()
         )
@@ -1091,7 +1130,6 @@ def reply_to_student(student_id):
             db.session.add(message)
             db.session.commit()
 
-            # Emit the message to the student's WebSocket room
             socketio.emit('new_message', {
                 'sender': current_user.username,
                 'content': content,
@@ -1110,7 +1148,6 @@ def reply_to_student(student_id):
     # Fetch previous messages (both student-to-mentor and mentor-to-student)
     student_messages = Messages.query.filter_by(sender_id=student.id, receiver_id=current_user.id).all()
     mentor_messages = MentorMessages.query.filter_by(sender_id=current_user.id, receiver_id=student.id).all()
-    # Combine and sort messages by timestamp
     all_messages = student_messages + mentor_messages
     all_messages.sort(key=lambda x: x.timestamp)
 
@@ -1237,7 +1274,3 @@ if __name__ == "__main__":
    
     app.run(debug=True)
 
-
-
-
-# https://www.freecodecamp.org/news/setup-email-verification-in-flask-app/
