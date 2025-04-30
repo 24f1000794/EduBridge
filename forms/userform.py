@@ -66,7 +66,7 @@ class forgetPasswordForm(FlaskForm):
 class requestResetPasswordForm(FlaskForm):
     otp = StringField('OTP', [validators.DataRequired()])
     newpwd = StringField('New Password', [validators.data_required(), validators.length(min=6, max=8)])
-    confirmpwd = StringField('Confirm New Password', [validators.data_required(), validators.length(min=6)])
+    confirmpwd = StringField('Confirm New Password', [validators.data_required(), validators.length(min=6,max=8)])
     submit = SubmitField('Submit')
 
     def validate_confirm_password(self, field):
