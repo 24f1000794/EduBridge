@@ -129,7 +129,7 @@ Add images, GIFs, or screenshots if helpful!
 ### Local Setup:
 ```bash
 # Clone the repo
-git clone https://github.com/your-team/project-name
+git clone https://github.com/pranshubatham78/EduBridge.git
 
 # Install dependencies
 see the requirement.txt
