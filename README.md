@@ -1,22 +1,138 @@
-# EduBridge
-EduBridge : AI powered rural education connector
+![github-submission-banner](https://github.com/user-attachments/assets/a1493b84-e4e2-456e-a791-ce35ee2bcf2f)
 
-STEP TO RUN THE APPLICATION
-----------------------------
+# 🚀 Project Title
 
-If you run on the vs code or any other IDE open the terminal and install all the dependencies given in requirements.txt.
-After, that run the command on the terminal python app.py
-It show you something like this : 
-               * Serving Flask app 'app'
- * Debug mode: on
-WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
- * Running on http://127.0.0.1:5000
-Press CTRL+C to quit
- * Restarting with stat
+> A one-line tagline or mission statement for your project.
 
-use this link ---> http://127.0.0.1:5000 and run this on you chorme and you can access all the features of the EduBridge.
+---
 
-NOTE: When you run the above command then a folder named "instance" is automatically created and inside that folder there's file create named "users.db"---> In this, you can see all the table and foregin key and all the relatioships between the tables.
+## 📌 Problem Statement
 
+Select the problem statement number and title from the official list given in Participant Manual.
 
-----------------------------------------------THANK YOU----------------------------------------------------------------------
+**Example:**  
+**Problem Statement 7 – Transform the Future of Rural Commerce**
+
+---
+
+## 🎯 Objective
+
+What problem does your project solve, and who does it serve?  
+Briefly describe the real-world use case and the value it provides.
+
+---
+
+## 🧠 Team & Approach
+
+### Team Name:  
+`Your team name here`
+
+### Team Members:  
+- Name 1 (GitHub / LinkedIn / Role)  
+- Name 2  
+- Name 3  
+*(Add links if you want)*
+
+### Your Approach:  
+- Why you chose this problem  
+- Key challenges you addressed  
+- Any pivots, brainstorms, or breakthroughs during hacking  
+
+---
+
+## 🛠️ Tech Stack
+
+### Core Technologies Used:
+- Frontend:
+- Backend:
+- Database:
+- APIs:
+- Hosting:
+
+### Sponsor Technologies Used (if any):
+- [ ] **Groq:** _How you used Groq_  
+- [ ] **Monad:** _Your blockchain implementation_  
+- [ ] **Fluvio:** _Real-time data handling_  
+- [ ] **Base:** _AgentKit / OnchainKit / Smart Wallet usage_  
+- [ ] **Screenpipe:** _Screen-based analytics or workflows_  
+- [ ] **Stellar:** _Payments, identity, or token usage_
+*(Mark with ✅ if completed)*
+---
+
+## ✨ Key Features
+
+Highlight the most important features of your project:
+
+- ✅ Feature 1  
+- ✅ Feature 2  
+- ✅ Feature 3  
+- ✅ Feature 4  
+
+Add images, GIFs, or screenshots if helpful!
+
+---
+
+## 📽️ Demo & Deliverables
+
+- **Demo Video Link:** [Paste YouTube or Loom link here]  
+- **Pitch Deck / PPT Link:** [Paste Google Slides / PDF link here]  
+
+---
+
+## ✅ Tasks & Bonus Checklist
+
+- [ ] **All members of the team completed the mandatory task - Followed at least 2 of our social channels and filled the form** (Details in Participant Manual)  
+- [ ] **All members of the team completed Bonus Task 1 - Sharing of Badges and filled the form (2 points)**  (Details in Participant Manual)
+- [ ] **All members of the team completed Bonus Task 2 - Signing up for Sprint.dev and filled the form (3 points)**  (Details in Participant Manual)
+
+*(Mark with ✅ if completed)*
+
+---
+
+## 🧪 How to Run the Project
+
+### Requirements:
+- Node.js / Python / Docker / etc.
+- API Keys (if any)
+- .env file setup (if needed)
+
+### Local Setup:
+```bash
+# Clone the repo
+git clone https://github.com/your-team/project-name
+
+# Install dependencies
+cd project-name
+npm install
+
+# Start development server
+npm run dev
+```
+
+Provide any backend/frontend split or environment setup notes here.
+
+---
+
+## 🧬 Future Scope
+
+List improvements, extensions, or follow-up features:
+
+- 📈 More integrations  
+- 🛡️ Security enhancements  
+- 🌐 Localization / broader accessibility  
+
+---
+
+## 📎 Resources / Credits
+
+- APIs or datasets used  
+- Open source libraries or tools referenced  
+- Acknowledgements  
+
+---
+
+## 🏁 Final Words
+
+Share your hackathon journey — challenges, learnings, fun moments, or shout-outs!
+
+---
