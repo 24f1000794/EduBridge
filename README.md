@@ -52,7 +52,7 @@ In this way, edubridge help each student not only rural or semi-rural to make th
 `EduFy`
 
 ### Team Members:  
-- Pranshu Gupta (GitHub /[ LinkedIn ](https://www.linkedin.com/in/pranshu-batham-414048292/)/ Backend)  
+- Pranshu Gupta ((https://github.com/pranshubatham78) /[ LinkedIn ](https://www.linkedin.com/in/pranshu-batham-414048292/)/ Backend)  
 - Aryan Gupta  (Frontend)
 - Shivansh Kushwaha (UI/UX) 
 *(Add links if you want)*
