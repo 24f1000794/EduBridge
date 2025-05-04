@@ -53,8 +53,8 @@ In this way, edubridge help each student not only rural or semi-rural to make th
 
 ### Team Members:  
 - Pranshu Gupta ((https://github.com/pranshubatham78) /[ LinkedIn ](https://www.linkedin.com/in/pranshu-batham-414048292/)/ Backend)  
-- Aryan Gupta  (Frontend)
-- Shivansh Kushwaha (UI/UX) 
+- Shivansh Kushwaha (https://www.linkedin.com/in/shivansh-kushwaha-86b914277/https://github.com/He-ro616/(UI/UX))
+- Aryan Gupta (https://www.linkedin.com/in/aryan-gupta-8757b929b/https://github.com/Aryan-0coder/Frontend)
 *(Add links if you want)*
 
 ### Your Approach:  
