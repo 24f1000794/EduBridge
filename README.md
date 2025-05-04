@@ -2,7 +2,7 @@
 
 # 🚀 Project Title
 
->Empowering rural education with AI-driven, offline-first learning.
+Empowering rural education with AI-driven, offline-first learning.
 
 ---
 
@@ -52,7 +52,7 @@ In this way, edubridge help each student not only rural or semi-rural to make th
 `EduFy`
 
 ### Team Members:  
-- Pranshu Gupta (GitHub / LinkedIn / Backend)  
+- Pranshu Gupta (GitHub /[ LinkedIn ](https://www.linkedin.com/in/pranshu-batham-414048292/)/ Backend)  
 - Aryan Gupta  (Frontend)
 - Shivansh Kushwaha (UI/UX) 
 *(Add links if you want)*
@@ -62,7 +62,7 @@ In this way, edubridge help each student not only rural or semi-rural to make th
   As I mentioned earlier, when student (no matter from rural or urban) visit any e-learning platfrom there they find alots of courses related to their niche which may or may not contain the exact content which is required in industries due to that they not get the right skiils besides if they have any doubt then they struggle to find the right mentor which result their doubt remains stay and they not master that skills. So, all these problems solve by our e-learning platform name "EduBridge".
   
 - Key challenges you addressed
-  1) Content are missing
+  1) Contents are missing
   2) Not get the right mentor
   3) There is not self-analysis where student can see how they learn from the video.
   4) Content are not in a sequence due to that student confuse from which course I need to start my learning journey mean if there is 10 courses on full-stack web devlopment in java for biggineers then student confuse which one is for bigginers in reality.
@@ -75,12 +75,12 @@ In this way, edubridge help each student not only rural or semi-rural to make th
 ### Core Technologies Used:
 - Frontend: CSS,TailWindCSS,HTML, javascript
 - Backend: flask,jinja
-- Database: sqlite
-- APIs: 
+- Database: sqlite,SQLALchemy(PostgreSQL)
+- APIs: LibreTranslate API, Groq API
 - Hosting: render
 
 ### Sponsor Technologies Used (if any):
-- [ ] **Groq:** _How you used Groq_  
+- [✅ ] **Groq:** _How you used Groq_  
 - [ ] **Monad:** _Your blockchain implementation_  
 - [ ] **Fluvio:** _Real-time data handling_  
 - [ ] **Base:** _AgentKit / OnchainKit / Smart Wallet usage_  
@@ -93,10 +93,10 @@ In this way, edubridge help each student not only rural or semi-rural to make th
 
 Highlight the most important features of your project:
 
-- ✅ Feature 1  
-- ✅ Feature 2  
-- ✅ Feature 3  
-- ✅ Feature 4  
+- ✅ Personalized Learning
+- ✅ Multilingual Support 
+- ✅ Offline Access
+- ✅ Mentor Matching
 
 Add images, GIFs, or screenshots if helpful!
 
@@ -104,16 +104,16 @@ Add images, GIFs, or screenshots if helpful!
 
 ## 📽️ Demo & Deliverables
 
-- **Demo Video Link:** [Paste YouTube or Loom link here]  
+- **Demo Video Link:** [https://youtu.be/PDMu-GSCLFA?si=PTiqfWloAkg0lv2R]  
 - **Pitch Deck / PPT Link:** [Paste Google Slides / PDF link here]  
 
 ---
 
 ## ✅ Tasks & Bonus Checklist
 
-- [ ] **All members of the team completed the mandatory task - Followed at least 2 of our social channels and filled the form** (Details in Participant Manual)  
-- [ ] **All members of the team completed Bonus Task 1 - Sharing of Badges and filled the form (2 points)**  (Details in Participant Manual)
-- [ ] **All members of the team completed Bonus Task 2 - Signing up for Sprint.dev and filled the form (3 points)**  (Details in Participant Manual)
+- [✅ ] **All members of the team completed the mandatory task - Followed at least 2 of our social channels and filled the form** (Details in Participant Manual)  
+- [✅ ] **All members of the team completed Bonus Task 1 - Sharing of Badges and filled the form (2 points)**  (Details in Participant Manual)
+- [✅ ] **All members of the team completed Bonus Task 2 - Signing up for Sprint.dev and filled the form (3 points)**  (Details in Participant Manual)
 
 *(Mark with ✅ if completed)*
 
@@ -132,14 +132,13 @@ Add images, GIFs, or screenshots if helpful!
 git clone https://github.com/your-team/project-name
 
 # Install dependencies
-cd project-name
-npm install
+see the requirement.txt
 
 # Start development server
-npm run dev
+python app.py
 ```
 
-Provide any backend/frontend split or environment setup notes here.
+
 
 ---
 
@@ -148,20 +147,40 @@ Provide any backend/frontend split or environment setup notes here.
 List improvements, extensions, or follow-up features:
 
 - 📈 More integrations
-  In future we'll integerate AI/ML which analysize the pattern of giving answers of questions based on that we generate the quiz for each course like Bigginers,Intermediate,and hard.
+  In future we'll integerate AI/ML which analysize the pattern of giving answers of questions based on that we generate the quiz for each course like Bigginers,Intermediate,and hard according to the student.--->Personalised learning dashboard.
   In future we'll integerate an LABS sections where users can perform lab related tasks like chemistry labs, physics lab, computer labs. In labs users do particular tasks which is taught during lectures like if they learn any reaction in chemistry they go to the labs and there they see all the chemicals and other tools like funnel,flask ,etc... in that they can mix required chemical and they can visualize all the reactions similary in physics labs they can perform experiments like sound,lens,electricity,etc....
+  In future with the help of the websockets, we'll create an full study environment where all the students enrolled in particular course can talk,share ideas,and navigate eachother.
+  In future, we'll convert our web-app into an app that's fully offline. So,there is not internet connection constraints.
+  In future, with the help of the AI/ML, we enchance our chatbot so user can talk to it in their own language and our chatbot reply to them in their own language.
+  
 - 🛡️ Security enhancements
+Right now our web application is deployed on render but in future we'll provide a particular domain for security.
 
 - 🌐 Localization / broader accessibility  
+Localization:
+Support additional Indian languages (e.g., Bengali, Telugu, Marathi) and dialects.
+Adapt content to regional contexts (e.g., culturally relevant examples in quizzes).
+Provide voice-based navigation and content delivery for low-literacy users.
+
+Broader Accessibility:
+Ensure compliance with WCAG 2.1 (Web Content Accessibility Guidelines) for users with disabilities.
+Optimize for low-bandwidth and intermittent connectivity.
+Support low-cost devices (e.g., feature phones, older smartphones).
+
+Scalability:
+Modular architecture to add new languages and accessibility features.
+Cloud-based deployment for global access.
+Community-driven content contributions (e.g., mentors adding localized quizzes).
 
 ---
 
 ## 📎 Resources / Credits
 
-- APIs or datasets used  
-- Open source libraries or tools referenced  
+- APIs or datasets used
+  LibreTranslate API, Groq API
+- Open source libraries or tools referenced
+  N/A
 - Acknowledgements  
-
 ---
 
 ## 🏁 Final Words
