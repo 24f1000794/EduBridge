@@ -122,7 +122,7 @@ Add images, GIFs, or screenshots if helpful!
 ## 🧪 How to Run the Project
 
 ### Requirements:
-- Node.js / Python / Docker / etc.
+- see requirment.txt file
 - API Keys (if any)
 - .env file setup (needed)
 
@@ -147,8 +147,11 @@ Provide any backend/frontend split or environment setup notes here.
 
 List improvements, extensions, or follow-up features:
 
-- 📈 More integrations  
-- 🛡️ Security enhancements  
+- 📈 More integrations
+  In future we'll integerate AI/ML which analysize the pattern of giving answers of questions based on that we generate the quiz for each course like Bigginers,Intermediate,and hard.
+  In future we'll integerate an LABS sections where users can perform lab related tasks like chemistry labs, physics lab, computer labs. In labs users do particular tasks which is taught during lectures like if they learn any reaction in chemistry they go to the labs and there they see all the chemicals and other tools like funnel,flask ,etc... in that they can mix required chemical and they can visualize all the reactions similary in physics labs they can perform experiments like sound,lens,electricity,etc....
+- 🛡️ Security enhancements
+
 - 🌐 Localization / broader accessibility  
 
 ---
