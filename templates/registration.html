@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduBridge Registration</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+    <style>
+        :root {
+            --primary: #6a1b9a;
+            --primary-dark: #4a0072;
+            --primary-light: #9c27b0;
+            --accent: #ff6e40;
+            --text-dark: #2d3748;
+            --text-light: #4a5568;
+            --background: #f7f9fc;
+            --card-bg: #ffffff;
+            --success: #38b2ac;
+            --danger: #e53e3e;
+            --warning: #ed8936;
+            --info: #4299e1;
+        }
+        
+        body {
+            background-color: var(--background);
+            color: var(--text-dark);
+            font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+            transition: all 0.3s ease;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='152' height='152' viewBox='0 0 152 152'%3E%3Cg fill-rule='evenodd'%3E%3Cg id='temple' fill='%239C92AC' fill-opacity='0.03'%3E%3Cpath d='M152 150v2H0v-2h28v-8H8v-20H0v-2h8V80h42v20h20v42H30v8h90v-8H80v-42h20V80h42v40h8V30h-8v40h-42V50H80V8h40V0h2v8h20v20h8V0h2v150zm-2 0v-28h-8v20h-20v8h28zM82 30v18h18V30H82zm20 18h20v20h18V30h-20V10H82v18h20v20zm0 2v18h18V50h-18zm20-22h18V10h-18v18zm-54 92v-18H50v18h18zm-20-18H28V82H10v38h20v20h38v-18H48v-20zm0-2V82H30v18h18zm-20 22H10v18h18v-18zm54 0v18h38v-20h20V82h-18v20h-20v20H82zm18-20H82v18h18v-18zm2-2h18V82h-18v18zm20 40v-18h18v18h-18zM30 0h-2v8H8v20H0v2h8v40h42V50h20V8H30V0zm20 48h18V30H50v18zm18-20H48v20H28v20H10V30h20V10h38v18zM30 50h18v18H30V50zm-2-40H10v18h18V10z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Navbar Styles */
+        .navbar {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .navbar-brand {
+            color: white;
+            font-weight: 700;
+            font-size: 1.5rem;
+            letter-spacing: -0.5px;
+        }
+
+        .navbar-brand:hover {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.85);
+            font-weight: 500;
+            padding: 8px 16px !important;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            margin: 0 3px;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-1px);
+        }
+
+        /* Form Container */
+        .form-container {
+            max-width: 800px;
+            margin: 40px auto 60px;
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04), 0 6px 12px rgba(0, 0, 0, 0.02);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(240, 240, 250, 0.8);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .form-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(to right, var(--primary), var(--primary-light));
+        }
+
+        .form-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(106, 27, 154, 0.1), 0 10px 25px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Form Controls */
+        .form-control, .form-select {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            background-color: #f8fafc;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(156, 39, 176, 0.15);
+            background-color: #fff;
+        }
+
+        .form-label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+            color: var(--text-dark);
+        }
+
+        /* Button Styles */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            border: none;
+            padding: 10px 20px;
+            font-weight: 600;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(156, 39, 176, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--primary-light), var(--primary));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(156, 39, 176, 0.4);
+        }
+
+        /* Form Heading */
+        .form-container h1 {
+            font-weight: 800;
+            color: var(--primary-dark);
+            margin-bottom: 1.5rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        .form-container h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+            border-radius: 2px;
+        }
+
+        /* Links */
+        a {
+            color: var(--primary);
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        a:hover {
+            color: var(--primary-light);
+            text-decoration: underline;
+        }
+
+        /* Error messages */
+        .text-danger {
+            color: var(--danger) !important;
+            font-size: 0.85rem;
+            margin-top: 5px;
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        /* Dark Mode */
+        .dark-mode {
+            --background: #1a1a2e;
+            --card-bg: #2a2a3c;
+            --text-dark: #e2e8f0;
+            --text-light: #a0aec0;
+        }
+
+        .dark-mode .form-container {
+            background: var(--card-bg);
+            border-color: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .dark-mode .form-control, .dark-mode .form-select {
+            background-color: rgba(0, 0, 0, 0.2);
+            border-color: rgba(255, 255, 255, 0.1);
+            color: var(--text-dark);
+        }
+
+        .dark-mode .form-control:focus, .dark-mode .form-select:focus {
+            background-color: rgba(0, 0, 0, 0.3);
+            border-color: rgba(156, 39, 176, 0.5);
+        }
+
+        .dark-mode .form-label {
+            color: var(--text-light);
+        }
+
+        .dark-mode .btn-primary {
+            background: linear-gradient(135deg, #9c27b0, #7e57c2);
+            box-shadow: 0 4px 10px rgba(156, 39, 176, 0.5);
+        }
+
+        .dark-mode .btn-primary:hover {
+            background: linear-gradient(135deg, #7e57c2, #9c27b0);
+        }
+
+        .dark-mode a {
+            color: #bb86fc;
+        }
+
+        .dark-mode a:hover {
+            color: #d4a7ff;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('LandingPage') }}">EduBridge</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <!-- <li class="nav-item">
+                        <a class="nav-link active" href="">Register</a>
+                    </li> -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+                    </li>
+                </ul>
+                <button class="btn btn-outline-light ms-3" id="toggle-dark-mode">Toggle Dark Mode</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container form-container">
+        <h1 class="mb-5">Join EduBridge</h1>
+        
+        <div class="mb-4">
+            <p class="text-muted">Create your account to start your learning journey with us.</p>
+        </div>
+        
+        <form action="{{ url_for('register') }}" method="POST">
+            {{ form.hidden_tag() }}
+            
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <div class="form-group">
+                        <label for="username" class="form-label">{{ form.username.label }}</label>
+                        <div class="input-group">
+                            <span class="input-group-text" style="background: rgba(106, 27, 154, 0.1); border-color: #e2e8f0; border-right: none;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person" viewBox="0 0 16 16" style="color: var(--primary);">
+                                    <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
+                                </svg>
+                            </span>
+                            {{ form.username(id="username", type="text", class="form-control", placeholder="Choose a username") }}
+                        </div>
+                        {% if form.username.errors %}
+                        <ul class="text-danger mt-1">
+                            {% for error in form.username.errors %}
+                            <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-4">
+                    <div class="form-group">
+                        <label for="fullname" class="form-label">{{ form.fullname.label }}</label>
+                        <div class="input-group">
+                            <span class="input-group-text" style="background: rgba(106, 27, 154, 0.1); border-color: #e2e8f0; border-right: none;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-badge" viewBox="0 0 16 16" style="color: var(--primary);">
+                                    <path d="M6.5 2a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1h-3zM11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+                                    <path d="M4.5 0A2.5 2.5 0 0 0 2 2.5V14a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2.5A2.5 2.5 0 0 0 11.5 0h-7zM3 2.5A1.5 1.5 0 0 1 4.5 1h7A1.5 1.5 0 0 1 13 2.5v10.795a4.2 4.2 0 0 0-.776-.492C11.392 12.387 10.063 12 8 12s-3.392.387-4.224.803a4.2 4.2 0 0 0-.776.492V2.5z"/>
+                                </svg>
+                            </span>
+                            {{ form.fullname(type="text", class="form-control", placeholder="Your full name") }}
+                        </div>
+                        {% if form.fullname.errors %}
+                        <ul class="text-danger mt-1">
+                            {% for error in form.fullname.errors %}
+                            <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <div class="form-group">
+                    <label for="email" class="form-label">{{ form.email.label }}</label>
+                    <div class="input-group">
+                        <span class="input-group-text" style="background: rgba(106, 27, 154, 0.1); border-color: #e2e8f0; border-right: none;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-envelope" viewBox="0 0 16 16" style="color: var(--primary);">
+                                <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4Zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1H2Zm13 2.383-4.708 2.825L15 11.105V5.383Zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741ZM1 11.105l4.708-2.897L1 5.383v5.722Z"/>
+                            </svg>
+                        </span>
+                        {{ form.email(type="email", class="form-control", placeholder="Your email address") }}
+                    </div>
+                    {% if form.email.errors %}
+                    <ul class="text-danger mt-1">
+                        {% for error in form.email.errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <div class="form-group">
+                    <label for="password" class="form-label">{{ form.password.label }}</label>
+                    <div class="input-group">
+                        <span class="input-group-text" style="background: rgba(106, 27, 154, 0.1); border-color: #e2e8f0; border-right: none;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-lock" viewBox="0 0 16 16" style="color: var(--primary);">
+                                <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zM5 8h6a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/>
+                            </svg>
+                        </span>
+                        {{ form.password(type="password", class="form-control", placeholder="Choose a secure password") }}
+                    </div>
+                    {% if form.password.errors %}
+                    <ul class="text-danger mt-1">
+                        {% for error in form.password.errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <div class="form-group">
+                        <label for="qualification" class="form-label">{{ form.qualification.label }}</label>
+                        <div class="input-group">
+                            <span class="input-group-text" style="background: rgba(106, 27, 154, 0.1); border-color: #e2e8f0; border-right: none;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-book" viewBox="0 0 16 16" style="color: var(--primary);">
+                                    <path d="M1 2.828c.885-.37 2.154-.769 3.388-.893 1.33-.134 2.458.063 3.112.752v9.746c-.935-.53-2.12-.603-3.213-.493-1.18.12-2.37.461-3.287.811V2.828zm7.5-.141c.654-.689 1.782-.886 3.112-.752 1.234.124 2.503.523 3.388.893v9.923c-.918-.35-2.107-.692-3.287-.81-1.094-.111-2.278-.039-3.213.492V2.687zM8 1.783C7.015.936 5.587.81 4.287.94c-1.514.153-3.042.672-3.994 1.105A.5.5 0 0 0 0 2.5v11a.5.5 0 0 0 .707.455c.882-.4 2.303-.881 3.68-1.02 1.409-.142 2.59.087 3.223.877a.5.5 0 0 0 .78 0c.633-.79 1.814-1.019 3.222-.877 1.378.139 2.8.62 3.681 1.02A.5.5 0 0 0 16 13.5v-11a.5.5 0 0 0-.293-.455c-.952-.433-2.48-.952-3.994-1.105C10.413.809 8.985.936 8 1.783z"/>
+                                </svg>
+                            </span>
+                            {{ form.qualification(type="text", class="form-control", placeholder="Your educational qualification") }}
+                        </div>
+                        {% if form.qualification.errors %}
+                        <ul class="text-danger mt-1">
+                            {% for error in form.qualification.errors %}
+                            <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-4">
+                    <div class="form-group">
+                        <label for="date_of_birth" class="form-label">{{ form.date_of_birth.label }}</label>
+                        <div class="input-group">
+                            <span class="input-group-text" style="background: rgba(106, 27, 154, 0.1); border-color: #e2e8f0; border-right: none;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-calendar" viewBox="0 0 16 16" style="color: var(--primary);">
+                                    <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
+                                </svg>
+                            </span>
+                            {{ form.date_of_birth(type="date", class="form-control") }}
+                        </div>
+                        {% if form.date_of_birth.errors %}
+                        <ul class="text-danger mt-1">
+                            {% for error in form.date_of_birth.errors %}
+                            <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <div class="form-group">
+                        <label for="language_pref" class="form-label">{{ form.language_pref.label }}</label>
+                        <div class="input-group">
+                            <span class="input-group-text" style="background: rgba(106, 27, 154, 0.1); border-color: #e2e8f0; border-right: none;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-translate" viewBox="0 0 16 16" style="color: var(--primary);">
+                                    <path d="M4.545 6.714 4.11 8H3l1.862-5h1.284L8 8H6.833l-.435-1.286H4.545zm1.634-.736L5.5 3.956h-.049l-.679 2.022H6.18z"/>
+                                    <path d="M0 2a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v3h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-3H2a2 2 0 0 1-2-2V2zm2-1a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H2zm7.138 9.995c.193.301.402.583.63.846-.748.575-1.673 1.001-2.768 1.292.178.217.451.635.555.867 1.125-.359 2.08-.844 2.886-1.494.777.665 1.739 1.165 2.93 1.472.133-.254.414-.673.629-.89-1.125-.253-2.057-.694-2.82-1.284.681-.747 1.222-1.651 1.621-2.757H14V8h-3v1.047h.765c-.318.844-.74 1.546-1.272 2.13a6.066 6.066 0 0 1-.415-.492 1.988 1.988 0 0 1-.94.31z"/>
+                                </svg>
+                            </span>
+                            {{ form.language_pref(class="form-select") }}
+                        </div>
+                        {% if form.language_pref.errors %}
+                        <ul class="text-danger mt-1">
+                            {% for error in form.language_pref.errors %}
+                            <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-4">
+                    <div class="form-group">
+                        <label for="interest" class="form-label">{{ form.interest.label }}</label>
+                        <div class="input-group">
+                            <span class="input-group-text" style="background: rgba(106, 27, 154, 0.1); border-color: #e2e8f0; border-right: none;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-stars" viewBox="0 0 16 16" style="color: var(--primary);">
+                                    <path d="M7.657 6.247c.11-.33.576-.33.686 0l.645 1.937a2.89 2.89 0 0 0 1.829 1.828l1.936.645c.33.11.33.576 0 .686l-1.937.645a2.89 2.89 0 0 0-1.828 1.829l-.645 1.936a.361.361 0 0 1-.686 0l-.645-1.937a2.89 2.89 0 0 0-1.828-1.828l-1.937-.645a.361.361 0 0 1 0-.686l1.937-.645a2.89 2.89 0 0 0 1.828-1.828l.645-1.937zM3.794 1.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387A1.734 1.734 0 0 0 4.593 5.69l-.387 1.162a.217.217 0 0 1-.412 0L3.407 5.69A1.734 1.734 0 0 0 2.31 4.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387A1.734 1.734 0 0 0 3.407 2.31l.387-1.162zM10.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.156 1.156 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.156 1.156 0 0 0-.732-.732L9.1 2.137a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732L10.863.1z"/>
+                                </svg>
+                            </span>
+                            {{ form.interest(class="form-select") }}
+                        </div>
+                        {% if form.interest.errors %}
+                        <ul class="text-danger mt-1">
+                            {% for error in form.interest.errors %}
+                            <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-5 text-center">
+                {{ form.submit(class="btn btn-primary px-5 py-2") }}
+                <div class="mt-4">
+                    <span class="text-muted">Already registered?</span>
+                    <a href="{{ url_for('login') }}" class="ms-1 font-weight-bold">Login to your account</a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <footer class="mt-5 py-4 text-center text-muted">
+        <div class="container">
+            <p>© 2025 EduBridge. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Dark/Light Mode Toggle
+        const toggleButton = document.getElementById("toggle-dark-mode");
+        toggleButton.addEventListener("click", () => {
+            document.body.classList.toggle("dark-mode");
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldnv0O8t5Ew5xgkIoE5zF6pGxg5k5t5g5t5g5t5" crossorigin="anonymous"></script>
+</body>
+
+</html>
